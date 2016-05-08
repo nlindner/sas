@@ -9,11 +9,4 @@ Other useful packages I use in conjunction with this:
 - The macro "do" block (if/else/else if...then do) is MUCH easier to work with after installing [FacelessUser's BracketHighlighter package](https://packagecontrol.io/packages/BracketHighlighter). I'll post my SAS-specific additions to bh_core.sublime-settings
 
 If you have any syntax highlighting problems, please don't hesitate to submit an issue with sample code.
- 
-Installation
-```
-git clone git://github.com/nlindner/sas.tmbundle.git SAS
-```
-
-
 
