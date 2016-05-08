@@ -6,7 +6,7 @@ A fork of RPardee's SAS programming package, developed in Sublime Text 3. Focuse
 
 Other useful packages I use in conjunction with this:
 - The great [jbrooksuk's Improved​SQL syntax highlighting](https://packagecontrol.io/packages/ImprovedSQL), which means that I'm able to minimize SQL-syntax additions 
-- The macro "do" block (if/else/else if...then do) is MUCH easier to work with after installing [acelessUser's BracketHighlighter package](https://packagecontrol.io/packages/BracketHighlighter). I'll post my SAS-specific additions to bh_core.sublime-settings
+- The macro "do" block (if/else/else if...then do) is MUCH easier to work with after installing [FacelessUser's BracketHighlighter package](https://packagecontrol.io/packages/BracketHighlighter). I'll post my SAS-specific additions to bh_core.sublime-settings
 
 If you have any syntax highlighting problems, please don't hesitate to submit an issue with sample code.
  
