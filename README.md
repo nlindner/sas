@@ -1,21 +1,19 @@
 #SAS Package for Sublime Text
 
-A modest package for doing SAS programming. [Read all about it here.](http://implementing-vdw.blogspot.com/2012/10/new-sublime-text-package-available-for.html)
+A fork of RPardee's SAS programming package, developed in Sublime Text 3. Focused on SAS's PROC SQL and MACRO language, because that's where I spend 90% of my time. 
+- At least in SAS EG, if a PROC SQL step is opened in a macro, then unless a QUIT is issued before the macro terminates, SAS' status will just show a "running" until you issue a STOP PROCESS. Heaven knows what SAS chooses to do in a scheduled process with a macro or or data step like that. Because of that, the scoping requires that DATA step ends with RUN and PROC SQL (and other procs) end with QUIT. 
+- I've limited DATA step's begin-capture scope, I don't use data step or the specialized PROCs enough to have seen any problems resulting from this. 
 
-Installation is via git only right now.  In your [packages folder](http://docs.sublimetext.info/en/latest/basic_concepts.html#the-packages-directory):
+Other useful packages I use in conjunction with this:
+- The great [jbrooksuk's Improved​SQL syntax highlighting](https://packagecontrol.io/packages/ImprovedSQL), which means that I'm able to minimize SQL-syntax additions 
+- The macro "do" block (if/else/else if...then do) is MUCH easier to work with after installing [acelessUser's BracketHighlighter package](https://packagecontrol.io/packages/BracketHighlighter). I'll post my SAS-specific additions to bh_core.sublime-settings
 
+If you have any syntax highlighting problems, please don't hesitate to submit an issue with sample code.
+ 
+Installation
 ```
-git clone git://github.com/rpardee/sas.tmbundle.git SAS
+git clone git://github.com/nlindner/sas.tmbundle.git SAS
 ```
 
-Or failing that, [download the package as a zip from github](https://github.com/rpardee/sas.tmbundle/zipball/master) and then unzip it into %PACKAGES%/SAS.
 
-I am now developing in Sublime Text 3 beta, though I believe everything works in ST2.
 
-#To-Do
-1. Polish build system.
-  1. Fix error/warning check.
-  2. (Possible?) Bring ST3 to the fore upon completion of a job.
-2. Make installable via [Package Control](http://wbond.net/sublime_packages/package_control).  (Subject to Package Control's compatibility w/ST3.)
-3. Polish syntax definition.
-4. Add a menu item to allow quick access to SAS.sublime-settings

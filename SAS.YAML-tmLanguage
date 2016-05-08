@@ -1,0 +1,333 @@
+# [PackageDev] target_format: plist, ext: tmLanguage
+name: SAS MacroSQL
+scopeName: source.sas
+fileTypes: [sas]
+uuid: 4f24b67d-429e-4053-b6d5-218ffdadf52d
+
+patterns:
+- include: '#starComment'
+- include: '#blockComment'
+- include: '#constant'
+- include: '#quote'
+- include: '#operator'
+- include: '#parameter-name'
+- include: '#macrocall'
+
+- include: '#sas-stuff'
+
+- include: '#metamacro'
+
+- include: '#metadatastep'
+
+- include: '#metasql'
+- include: '#parameter-name'
+
+- include: '#metaproc'
+
+  # added 2016.03.17 Needed to capture remaining data step
+- include: '#metadatastep'
+
+- name: keyword.sas
+  match: (?i:\b(_n_|_error_)\b)
+
+- include: '#operator'
+
+- name: line.terminator.sas
+  match: ;
+  captures:
+    '0': {name: keyword.emphasis.sas}
+
+- include: '#macrocall'
+
+- include: '#parameter-name'
+- include: '#starComment'
+
+repository:
+
+  quote:
+    comment: Using rpardee repository name, but using SQL-style logic for quotes.
+    patterns:
+    - name: string.quoted.single.sas
+      match: (')[^'\\]*(')
+      captures:
+        '1': {name: punctuation.definition.string.begin.sas}
+        '2': {name: punctuation.definition.string.end.sas}
+    - name: string.quoted.double.sas
+      match: (")[^"#]*(")
+      captures:
+        '1': {name: punctuation.definition.string.begin.sas}
+        '3': {name: punctuation.definition.string.end.sas}
+        
+  blockComment:
+    name: comment.block.slashstar.sas
+    begin: \/\*
+    end: \*\/
+    
+  starComment:
+    patterns:
+      - include: '#blockcomment'
+      - name: comment.line.inline.star.sas
+        begin: (?<=;)[\s%]*\*
+        end: ;
+      - name: comment.line.start.sas
+        begin: ^[\s%]*\*
+        end: ;
+        
+  macrocall:
+    patterns:
+      - name: keyword.control.macro.sas
+        match: (%)+(?i:(if|do|else|goto|end|then|local|global|to|until|while|by|sysfunc|sysfuncf))\b
+        captures:
+          '1': {name: support.class.sas}
+          '2': {name: support.function.macro.sas}
+        comment: 2015.12.06 added sysfunc and sysfuncf here
+      - name: support.function.macrocall.sas
+        match: (?i:(%)(?!by|do|else|end|eval\b|global|goto|if|local|macro|mend|then|to|until|while|bquote|include|index|left|length|let|lowcase|nrbquote|nrquote|nrstr|put|qlowcase|qscan|qsubstr|qsysfunc|quote\b|qupcase|scan|str|substr|superq|symexist|symglobl|symlocal|sysevalf|sysfunc|sysget|sysmacexec|sysmacexist|sysmexecdepth|sysmexecname|sysprod|unquote|upcase)([A-Aa-z0-9_&]+))
+        captures:
+          '1': {name: variable.language.control.sas}
+          '2': {name: keyword.emphasis.sas}
+          '3': {name: keyword.operator.class.terminator.sas}
+        comment: after excluding macro control tries to match calling to a compiled macro name. This has to be called after everything else.
+          2015.12.18 Moved paramname ahead of opencode
+          2016.02.11 added all macro functions from SAS Help (e.g., qlowcase) and aligned the non "macro call" (e.g., do, while, global) with ...#opencode-pct keywords
+      - include: '#parameter-name'
+      - include: '#opencode-pct'
+
+
+  opencode-pct:
+    name: support.function.opencode.sas
+    match: (%)(?i:(bquote|eval|include|index|left|length|let|lowcase|nrbquote|nrquote|nrstr|put|qlowcase|qscan|qsubstr|qsysfunc|quote|qupcase|scan|str|substr|superq|symexist|symexist|symglobl|symlocal|sysevalf|sysfunc|sysget|sysmacexec|sysmacexist|sysmexecdepth|sysmexecname|sysprod|unquote|upcase))\b
+    captures:
+      '1': {name: variable.language.control.sas}
+      '2': {name: support.class.sas}
+    comment: 2014.10.26 changed this to add a \b at end so that macros that begin like these are not captured
+    comment: 2016.02.11 Added all macro functions I could find. See #macrocall section capturing variable.language.control.sas
+
+
+  parameter-name:
+    name: variable.parameter.macro.sas
+    match: (&\w+)
+    comment: this has to be called before AND after support.function.opencode. NLM removed space to capture macro params embedded in larger string (or multiple params strung together)
+
+  constant:
+    comment: 2015 switched to rpardee SAS syntax. Is very nicely done.
+    patterns:
+      - include: '#dateConstant'
+      - name: constant.numeric.sas
+        comment: numeric constant
+        match: (?<![&\}])\b[0-9]*\.?[0-9]+([eEdD][-+]?[0-9]+)?\b
+      - name: constant.language.name-literal.single.sas
+        comment: single quote name literal
+        match: (')([^']+)(')([nN])\b
+      - name: constant.language.name-literal.double.sas
+        comment: double quote name literal
+        match: (")([^"]+)(")([nN])\b
+      - name: constant.character.bit.single.sas
+        comment: single quote bit testing constant
+        match: (')([01]+)(')([bB])\b
+      - name: constant.character.bit.double.sas
+        comment: double quote bit testing constant
+        match: (")([01]+)(")([bB])\b
+      - name: constant.character.hex.single.sas
+        comment: single quote hexidecimal constant
+        match: (')(([a-fA-F0-9]{2})+)(')([xX])\b
+      - name: constant.character.hex.double.sas
+        comment: double quote hexidecimal constant
+        match: (")(([a-fA-F0-9]{2})+)(")([xX])\b
+      - name: constant.other.catchothers.macro.sas
+        comment: double quoted catchall for fallout
+        match: (?i:(")([a-z0-9_\.&]+)(")([xbn]|d|t|dt))\b
+        
+
+  dateConstant:
+    comment: 2015 switched to rpardee SAS syntax. Is very nicely done.
+    patterns:
+      - name: constant.numeric.date.single.sas
+        comment: single quote date constant
+        match: (')(\d{1,2}(?i:(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec))\d{2,4})(')([dD])\b
+        
+      - name: constant.numeric.date.double.sas
+        comment: double quote date constant
+        match: (")(\d{1,2}(?i:(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec))\d{2,4})(")([dD])\b
+        
+      - name: constant.numeric.time.single.sas
+        comment: single quote time constant
+        match: (')(\d{1,2}:\d{1,2}(:\d{1,2}(\.\d+)?)?([aApP][mM])?)(')([tT])\b
+      - name: constant.numeric.time.single.sas
+        comment: double quote time constant
+        match: (")(\d{1,2}:\d{1,2}(:\d{1,2}(\.\d+)?)?([aApP][mM])?)(")([tT])\b
+      - name: constant.numeric.datetime.single.sas
+        comment: single quote datetime constant
+        match: (')(\d{1,2}(?i:(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec))\d{2,4}:\d{1,2}:\d{1,2}(:\d{1,2}(\.\d+)?)?([aApP][mM])?)(')([dD][tT])\b
+        
+      - name: constant.numeric.datetime.single.sas
+        comment: double quote datetime constant
+        match: (")(\d{1,2}(?i:(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec))\d{2,4}:\d{1,2}:\d{1,2}(:\d{1,2}(\.\d+)?)?([aApP][mM])?)(")([dD][tT])\b
+        
+      - name: constant.numeric.macrodte.double.sas
+        comment: double quote macro variable date constant
+        match: (")(&+(?i:[a-z_]([a-z0-9_]+)?)(\.+)?)(")(?i:(d|t|dt))\b
+
+  operator:
+    patterns:
+      - name: keyword.operator.arithmetic.sas
+        match: ([\+\-\*\^\/])
+      - name: keyword.operator.comparison.I.sas
+        match: \b(?i:(eq|ne|gt|lt|ge|le|in|not|and|or|min|max))\b
+        comment: 2015.12.18 NLM removed ampersand from rpardee because was catching macro param names because it is called before #parameter-name
+      - name: keyword.operator.comparison.II.sas
+        match: '[!<>]?=|<>|<|>'
+      - name: keyword.operator.concatenator.sas
+        match: \|\|
+      - name: keyword.operator.sas
+        match: ([¬<>^~]?=(:)?|>|<|\||!|¦|¬|^|~|<>|><|\|\|)
+        comment: Changes vs rpardee Exclude SQL keywords (relying on improved SQL highlighting or Postgres/MSSQL-specific)
+        name: keyword.other.sas
+        match: \b(?i:(_all_|_character_|_cmd_|_freq_|_i_|_infile_|_last_|_msg_|_null_|_numeric_|_temporary_|_type_|abort|abs|addr|adjrsq|airy|alpha|alter|altlog|altprint|and|arcos|array|arsin|as|atan|attrc|attrib|attrn|authserver|autoexec|awscontrol|awsdef|awsmenu|awsmenumerge|awstitle|backward|band|base|betainv|between|blocksize|blshift|bnot|bor|brshift|bufno|bufsize|bxor|by|byerr|byline|byte|calculated|call|cards|cards4|catcache|cbufno|cdf|ceil|center|cexist|change|chisq|cinv|class|cleanup|close|cnonct|cntllev|coalesce|codegen|col|collate|collin|column|comamid|comaux1|comaux2|comdef|compbl|compound|compress|config|continue|convert|cos|cosh|cpuid|cross|crosstab|css|curobs|cv|daccdb|daccdbsl|daccsl|daccsyd|dacctab|dairy|datalines|datalines4|datejul|datepart|datetime|day|dbcslang|dbcstype|dclose|ddm|delete|delimiter|depdb|depdbsl|depsl|depsyd|deptab|dequote|descending|descript|design=|device|dflang|dhms|dif|digamma|dim|dinfo|display|dkricond|dkrocond|dlm|dnum|do|dopen|doptname|doptnum|dread|drop|dropnote|dsname|dsnferr|echo|else|emaildlg|emailid|emailpw|emailserver|emailsys|encrypt|end|endsas|engine|eof|eov|erf|erfc|error|errorcheck|errors|exist|exp|fappend|fclose|fcol|fdelete|feedback|fetch|fetchobs|fexist|fget|file|fileclose|fileexist|filefmt|filename|fileref|filevar|finfo|finv|fipname|fipnamel|fipstate|first|firstobs|floor|fmterr|fmtsearch|fnonct|fnote|font|fontalias|footnote|footnote1|footnote2|footnote3|footnote4|footnote5|footnote6|footnote7|footnote8|footnote9|fopen|foptname|foptnum|force|formatted|formchar|formdelim|formdlim|forward|fpoint|fpos|fput|fread|frewind|frlen|fsep|fuzz|fwrite|gaminv|gamma|getoption|getvarc|getvarn|go|group|gwindow|hbar|hbound|helpenv|helploc|hms|honorappearance|hosthelp|hostprint|hour|hpct|html|hvar|ibessel|ibr|id|if|indexc|indexw|initcmd|initstmt|inner|input|inputc|inputn|inr|insert|int|intck|intnx|into|intrr|invaliddata|irr|is|jbessel|juldate|keep|kentb|kurtosis|label|lag|last|lbound|leave|left|length|levels|lgamma|lib|libname|library|libref|line|linesize|link|list|log|log10|log2|logpdf|logpmf|logsdf|lostcard|lowcase|lrecl|ls|macrogen|maps|mautosource|max|maxdec|maxr|mdy|mean|measures|median|memtype|merge|merror|min|minute|missover|mlogic|mod|mode|model|modify|month|mopen|mort|mprint|mrecall|msglevel|msymtabmax|mvarsize|myy|n|nest|netpv|new|news|nmiss|no|nobatch|nobs|nocaps|nocardimage|nocenter|nocharcode|nocmdmac|nocol|nocum|nodate|nodbcs|nodetails|nodmr|nodms|nodmsbatch|nodup|nodupkey|noduplicates|noechoauto|noequals|noerrorabend|noexitwindows|nofullstimer|noicon|noimplmac|noint|nolist|noloadlist|nomiss|nomlogic|nomprint|nomrecall|nomsgcase|nomstored|nomultenvappl|nonotes|nonumber|noobs|noovp|nopad|noprint|noprintinit|normal|norow|norsasuser|nosetinit|nosource2|nosplash|nosymbolgen|note|notes|notitle|notitles|notsorted|noverbose|noxsync|noxwait|npv|null|number|numkeys|nummousekeys|nway|obs|ods|open|option|or|order|ordinal|otherwise|out|outer|outp=|output|over|ovp|pad|pad2|page|pageno|pagesize|paired|parm|parmcards|path|pathdll|pathname|pdf|peek|peekc|pfkey|pmf|point|poisson|poke|position|printer|probbeta|probbnml|probchi|probf|probgam|probhypr|probit|probnegb|probnorm|probsig|probt|procleave|prt|ps|put|putc|putn|pw|pwreq|qtr|quote|r|ranbin|rancau|ranexp|rangam|range|ranks|rannor|ranpoi|rantbl|rantri|ranuni|read|recfm|register|regr|remote|remove|rename|repeat|replace|resolve|retain|return|reuse|reverse|rewind|right|round|rsquare|rtf|rtrace|rtraceloc|s|s2|samploc|sasautos|sascontrol|sasfrscr|sashelp|sasmsg|sasmstore|sasscript|sasuser|saving|scan|sdf|second|selection|separated|seq|serror|setcomm|setot|sign|simple|sin|sinh|siteinfo|skewness|skip|sle|sls|sortedby|sortpgm|sortseq|sortsize|soundex|source2|spedis|splashlocation|split|spool|sqrt|start|std|stderr|stdin|stfips|stimer|stname|stnamel|stop|stopover|subgroup|subpopn|substr|sum|sumwgt|symbol|symbolgen|symget|symput|sysget|sysin|sysleave|sysmsg|sysparm|sysprint|sysprintfont|sysprod|sysrc|system|t|tables|tan|tanh|tapeclose|tbufsize|terminal|test|then|timepart|tinv|title|title1|title2|title3|title4|title5|title6|title7|title8|title9|tnonct|to|today|tol|tooldef|totper|transformout|translate|trantab|tranwrd|trigamma|trim|trimn|trunc|truncover|type|unformatted|uniform|until|upcase|update|user|usericon|uss|validate|value|var|varfmt|varinfmt|varlabel|varlen|varname|varnum|varray|varrayx|vartype|verify|vformat|vformatd|vformatdx|vformatn|vformatnx|vformatw|vformatwx|vformatx|vinarray|vinarrayx|vinformat|vinformatd|vinformatdx|vinformatn|vinformatnx|vinformatw|vinformatwx|vinformatx|vlabel|vlabelx|vlength|vlengthx|vname|vnamex|vnferr|vtype|vtypex|weight|when|where|while|wincharset|window|workinit|workterm|write|wsum|xsync|xwait|yearcutoff|yes|yyq|zipfips|zipname|zipnamel|zipstate))\b
+
+  sas-stuff:
+    patterns:
+      - name: support.function.options.sas
+        match: \b(?i:(options))\b
+      - name: constant.numeric.dateformat.I.sas
+        #comment: storage.modifier.dateformat.I.sas
+        match: (?i:((monname|qtr|weekday|day|month|year|julday|worddate|pdjulg|pdjuli|date|dtdate|dtmonyy|julian|yymon|(ddmmyy|mmddyy|yymmdd|yyq|mmyy|yymm)[bcdnps]?))(?:\d+)?\.)
+      - name: support.function.dataset.sas
+        match: (?i:(\bdata\b)(\s*\=\s*)+([A-Za-z0-9_\.]++)\b)
+        captures:
+          '1': {name: support.function.dataset.sas}
+          '2': {name: keyword.operator.comparison.II.sas}
+          '3': {name: support.type.dataset.sas}
+
+
+  dataSetOptions:
+    patterns:
+      - name: keyword.other.sas
+        match: (?<=\s|\(|\))(?i:ALTER|BUFNO|BUFSIZE|CNTLLEV|COMPRESS|DLDMGACTION|ENCRYPT|ENCRYPTKEY|EXTENDOBSCOUNTER|GENMAX|GENNUM|INDEX|LABEL|OBSBUF|OUTREP|PW|PWREQ|READ|REPEMPTY|REPLACE|REUSE|ROLE|SORTEDBY|SPILL|TOBSNO|TYPE|WRITE|FILECLOSE|FIRSTOBS|IN|OBS|POINTOBS|WHERE|WHEREUP|IDXNAME|IDXWHERE|DROP|KEEP|RENAME)\s?=
+
+  # dataSet:
+  #   patterns:
+  #     - include: '#dataSetOptions'
+  #     - include: '#blockComment'
+  #     - include: '#constant'
+  #     - include: '#quote'
+  #     - include: '#operator'
+
+  metadatastep:
+  #Data step, must start on new line or itll even capture comments. captures
+  # code like data work.nml ;, data nml( [and then where drop, etc.)
+  # 2016.02.02 NLM prefixed \b to the end capture
+    name: meta.datastep.sas
+    begin: ^\s*\b(?i:(\bdata\b)\s++)([A-Za-z0-9_\.]+)\s*(;|\()
+    beginCaptures:
+      '1': {name: entity.name.function.datastep.sas}
+      '2': {name: support.class.sas}
+    end: (?i:\b(run)\b\s*(;))
+    endCaptures:
+      '1': {name: support.function.end}
+      '2': {name: keyword.operator.class.terminator.sas}
+    patterns:
+      # Replaced with rpardee logic 2015.12.06 '#comments'
+      - include: '#starComment'
+      - include: '#blockComment' 
+      - include: '#dataSetOptions'
+      - include: '#blockComment'
+      - include: '#constant'
+      - include: '#quote'
+      - include: '#operator'
+      - include: '#macrocall'
+      - name: keyword.control.datastep.sas
+        match: \b(?i:(set|update|modify|merge)\s++)([A-Za-z0-9_\.]+)
+        captures:
+          '1': {name: entity.name.function.datastep.sas}
+          '2': {name: support.class.sas}
+
+  metasql:
+    name: meta.procsql.sas
+    begin: \b(?i:(proc)\s+(sql)\b)
+    comment: matches proc step. List source.sql before SAS-stuff to apply SQL syntax before SAS. 2016.02.02 Added \b to quit 
+    beginCaptures:
+      '1': {name: entity.name.function.proc.sas}
+      '2': {name: support.class.sas}
+    end: (?i:\b(quit)\b\s*(;))
+    endCaptures:
+      '1': {name: support.function.end}
+      '2': {name: keyword.operator.class.terminator.sas}
+    patterns:
+      - include: source.sql
+      - include: '#starComment' #added per rpardee 2015.12.06
+      - include: '#blockComment' 
+      - include: '#constant'
+      - include: '#quote'
+      - include: '#operator'
+      - include: '#macrocall'
+      - include: '#metamacro'
+      - name: keyword.operator.null.sas
+        match: (?i:(\bis\b\s(\bnot\s*)?(null|missing)))
+      - name: support.function.connect.sas
+        match: (?i:((dis)?connect\b\s+(from|to)\b\s)+((\bas\b\s+)?\w++\b))
+        captures:
+          '1': {name: variable.language.connection.sas}
+          '3': {name: variable.language.connection.II.sas}
+          '4': {name: keyword.control.connection.sas}
+      - name: support.function.fromconnection.sas
+        match: (?i:(\bconnection\b\s+\bto\b\s+)+(\w++\b))
+        captures:
+          '1': {name: variable.language.connection.sas}
+          '2': {name: keyword.emphasis.connection.sas}
+
+  metaproc:
+    name: meta.proc.sas
+    begin: \b(?i:(proc)\s+(\w++)\b)
+    beginCaptures:
+      '1': {name: entity.name.function.proc.sas}
+      '2': {name: support.class.sas}
+    end: (?i:\b(run|quit)\b\s*(;))
+    endCaptures:
+      '1': {name: support.function.end}
+      '2': {name: keyword.operator.class.terminator.sas}
+    patterns:
+      - include: '#starComment' 
+      - include: '#blockComment'
+      - include: '#macrocall'
+      - include: '#sas-stuff'
+      - include: '#quote'
+
+  metamacro:
+    name: meta.macro.sas
+    comment: NLM changed order from metadatastep, metasql, metaproc and added another metasql
+    begin: (?i:(%)+(macro\b\s*)+([A-Za-z0-9_]+\b)(.*)(;))
+    beginCaptures:
+      '1': {name: keyword.operator.class.macro.sas}
+      '2': {name: support.class.sas}
+      '3': {name: support.function.end}
+      '4': {name: text.normal.sas}
+      '5': {name: keyword.operator.class.terminator.sas}
+    end: (?i)(%)+(mend\b)+(\s[A-Za-z0-9_\.]+)?(;)
+    endCaptures:
+      '1': {name: keyword.operator.class.macro.sas}
+      '2': {name: support.class.sas}
+      '3': {name: support.function.end}
+      '4': {name: keyword.operator.class.terminator.sas}
+    patterns:
+      - include: '#starComment' 
+      - include: '#blockComment'
+      - include: '#macrocall'
+      # 2015.12.18 Need paramname here
+      - include: '#parameter-name'
+      - include: '#metasql' 
+      - include: '#sas-stuff'
+      - include: '#quote' 
+      - include: '#operator'
+      - include: '#constant'
+      - name: comment.line.macro.sas
+        comment: SAS crappy format for recognizing line comments in macros
+        match: ^\s*%\*.*;$
+        captures:
+          '0': {name: punctuation.definition.comment.sas}
+      - include: '#metasql' 
+      - include: '#metadatastep'
+      - include: '#metaproc' 
+
+foldingStartMarker: (?i:(proc|data|%macro).*;$)
+foldingStopMarker: (?i:(run|quit|%mend)\s?);
