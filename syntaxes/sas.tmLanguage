@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>comment</key>
-	<string>A work in progress--improves over the existing in that it populates symbols, and handles comments more gracefully.</string>
 	<key>fileTypes</key>
 	<array>
 		<string>sas</string>
@@ -13,7 +11,7 @@
 	<key>foldingStopMarker</key>
 	<string>(?i:(run|quit|%mend)\s?);</string>
 	<key>name</key>
-	<string>SAS Program</string>
+	<string>SAS MacroSQL</string>
 	<key>patterns</key>
 	<array>
 		<dict>
@@ -23,10 +21,6 @@
 		<dict>
 			<key>include</key>
 			<string>#blockComment</string>
-		</dict>
-		<dict>
-			<key>include</key>
-			<string>#macro</string>
 		</dict>
 		<dict>
 			<key>include</key>
@@ -41,221 +35,93 @@
 			<string>#operator</string>
 		</dict>
 		<dict>
-			<key>begin</key>
-			<string>\b(?i:(data))\s+</string>
-			<key>beginCaptures</key>
-			<dict>
-				<key>1</key>
-				<dict>
-					<key>name</key>
-					<string>keyword.other.sas</string>
-				</dict>
-			</dict>
-			<key>comment</key>
-			<string>Begins a DATA step and provides names for any output SAS data sets, views, or programs.</string>
-			<key>end</key>
-			<string>(;)</string>
-			<key>patterns</key>
-			<array>
-				<dict>
-					<key>include</key>
-					<string>#blockComment</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#dataSet</string>
-				</dict>
-				<dict>
-					<key>captures</key>
-					<dict>
-						<key>1</key>
-						<dict>
-							<key>name</key>
-							<string>keyword.other.sas</string>
-						</dict>
-						<key>2</key>
-						<dict>
-							<key>name</key>
-							<string>keyword.other.sas</string>
-						</dict>
-					</dict>
-					<key>match</key>
-					<string>(?i:(?:(stack|pgm|view|source)\s?=\s?)|(debug|nesting|nolist))</string>
-				</dict>
-			</array>
+			<key>include</key>
+			<string>#parameter-name</string>
 		</dict>
 		<dict>
-			<key>begin</key>
-			<string>\b(?i:(set|update|modify|merge))\s+</string>
-			<key>beginCaptures</key>
-			<dict>
-				<key>1</key>
-				<dict>
-					<key>name</key>
-					<string>support.function.sas</string>
-				</dict>
-				<key>2</key>
-				<dict>
-					<key>name</key>
-					<string>entity.name.class.sas</string>
-				</dict>
-				<key>3</key>
-				<dict>
-					<key>name</key>
-					<string>entity.name.class.sas</string>
-				</dict>
-			</dict>
-			<key>comment</key>
-			<string>DATA set File-Handling Statements for DATA step</string>
-			<key>end</key>
-			<string>(;)</string>
-			<key>patterns</key>
-			<array>
-				<dict>
-					<key>include</key>
-					<string>#blockComment</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#dataSet</string>
-				</dict>
-			</array>
+			<key>include</key>
+			<string>#macrocall</string>
 		</dict>
 		<dict>
-			<key>match</key>
-			<string>(?i:\b(if|while|until|for|do|end|then|else|run|quit|cancel)\b)</string>
-			<key>name</key>
-			<string>keyword.control.sas</string>
+			<key>include</key>
+			<string>#sas-stuff</string>
 		</dict>
 		<dict>
-			<key>captures</key>
-			<dict>
-				<key>1</key>
-				<dict>
-					<key>name</key>
-					<string>support.class.sas</string>
-				</dict>
-				<key>3</key>
-				<dict>
-					<key>name</key>
-					<string>entity.name.function.sas</string>
-				</dict>
-			</dict>
-			<key>match</key>
-			<string>(?i:(%(macro|mend|do|if|then|end|while|until|goto|include)\b))\s*(\w*)</string>
-			<key>name</key>
-			<string>keyword.other.sas</string>
+			<key>include</key>
+			<string>#metamacro</string>
 		</dict>
 		<dict>
-			<key>begin</key>
-			<string>(?i:\b(proc\s*(sql))\b)</string>
-			<key>beginCaptures</key>
-			<dict>
-				<key>1</key>
-				<dict>
-					<key>name</key>
-					<string>support.function.sas</string>
-				</dict>
-				<key>2</key>
-				<dict>
-					<key>name</key>
-					<string>support.class.sas</string>
-				</dict>
-			</dict>
-			<key>comment</key>
-			<string>Looks like for this to work there must be a *name* as well as the patterns/include bit.</string>
-			<key>end</key>
-			<string>(?i:\b(quit)\s*;)</string>
-			<key>endCaptures</key>
-			<dict>
-				<key>1</key>
-				<dict>
-					<key>name</key>
-					<string>keyword.control.sas</string>
-				</dict>
-			</dict>
-			<key>name</key>
-			<string>meta.sql.sas</string>
-			<key>patterns</key>
-			<array>
-				<dict>
-					<key>include</key>
-					<string>#starComment</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#blockComment</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>source.sql</string>
-				</dict>
-			</array>
+			<key>include</key>
+			<string>#metadatastep</string>
 		</dict>
 		<dict>
-			<key>match</key>
-			<string>(?i:\b(by|label|format)\b)</string>
-			<key>name</key>
-			<string>keyword.datastep.sas</string>
+			<key>include</key>
+			<string>#metasql</string>
 		</dict>
 		<dict>
-			<key>captures</key>
-			<dict>
-				<key>1</key>
-				<dict>
-					<key>name</key>
-					<string>support.function.sas</string>
-				</dict>
-				<key>2</key>
-				<dict>
-					<key>name</key>
-					<string>support.class.sas</string>
-				</dict>
-			</dict>
-			<key>match</key>
-			<string>(?i:\b(proc (\w+))\b)</string>
-			<key>name</key>
-			<string>meta.function-call.sas</string>
+			<key>include</key>
+			<string>#parameter-name</string>
+		</dict>
+		<dict>
+			<key>include</key>
+			<string>#metaproc</string>
+		</dict>
+		<dict>
+			<key>include</key>
+			<string>#metadatastep</string>
 		</dict>
 		<dict>
 			<key>match</key>
 			<string>(?i:\b(_n_|_error_)\b)</string>
 			<key>name</key>
-			<string>variable.language.sas</string>
+			<string>keyword.sas</string>
+		</dict>
+		<dict>
+			<key>include</key>
+			<string>#operator</string>
 		</dict>
 		<dict>
 			<key>captures</key>
 			<dict>
-				<key>1</key>
+				<key>0</key>
 				<dict>
 					<key>name</key>
-					<string>support.class.sas</string>
+					<string>keyword.emphasis.sas</string>
 				</dict>
 			</dict>
 			<key>match</key>
-			<string>\b(?i:(_all_|_character_|_cmd_|_freq_|_i_|_infile_|_last_|_msg_|_null_|_numeric_|_temporary_|_type_|abort|abs|addr|adjrsq|airy|alpha|alter|altlog|altprint|and|arcos|array|arsin|as|atan|attrc|attrib|attrn|authserver|autoexec|awscontrol|awsdef|awsmenu|awsmenumerge|awstitle|backward|band|base|betainv|between|blocksize|blshift|bnot|bor|brshift|bufno|bufsize|bxor|by|byerr|byline|byte|calculated|call|cards|cards4|catcache|cbufno|cdf|ceil|center|cexist|change|chisq|cinv|class|cleanup|close|cnonct|cntllev|coalesce|codegen|col|collate|collin|column|comamid|comaux1|comaux2|comdef|compbl|compound|compress|config|continue|convert|cos|cosh|cpuid|create|cross|crosstab|css|curobs|cv|daccdb|daccdbsl|daccsl|daccsyd|dacctab|dairy|datalines|datalines4|datejul|datepart|datetime|day|dbcslang|dbcstype|dclose|ddm|delete|delimiter|depdb|depdbsl|depsl|depsyd|deptab|dequote|descending|descript|design=|device|dflang|dhms|dif|digamma|dim|dinfo|display|distinct|dkricond|dkrocond|dlm|dnum|do|dopen|doptname|doptnum|dread|drop|dropnote|dsname|dsnferr|echo|else|emaildlg|emailid|emailpw|emailserver|emailsys|encrypt|end|endsas|engine|eof|eov|erf|erfc|error|errorcheck|errors|exist|exp|fappend|fclose|fcol|fdelete|feedback|fetch|fetchobs|fexist|fget|file|fileclose|fileexist|filefmt|filename|fileref|filevar|finfo|finv|fipname|fipnamel|fipstate|first|firstobs|floor|fmterr|fmtsearch|fnonct|fnote|font|fontalias|footnote[1-9]?|fopen|foptname|foptnum|force|formatted|formchar|formdelim|formdlim|forward|fpoint|fpos|fput|fread|frewind|frlen|from|fsep|fuzz|fwrite|gaminv|gamma|getoption|getvarc|getvarn|go|goto|group|gwindow|hbar|hbound|helpenv|helploc|hms|honorappearance|hosthelp|hostprint|hour|hpct|html|hvar|ibessel|ibr|id|if|index|indexc|indexw|initcmd|initstmt|inner|input|inputc|inputn|inr|insert|int|intck|intnx|into|intrr|invaliddata|irr|is|jbessel|join|juldate|keep|kentb|kurtosis|label|lag|last|lbound|leave|left|length|levels|lgamma|lib|libname|library|libref|line|linesize|link|list|log|log10|log2|logpdf|logpmf|logsdf|lostcard|lowcase|lrecl|ls|macro|macrogen|maps|mautosource|max|maxdec|maxr|mdy|mean|measures|median|memtype|merge|merror|min|minute|missing|missover|mlogic|mod|mode|model|modify|month|mopen|mort|mprint|mrecall|msglevel|msymtabmax|mvarsize|myy|n|nest|netpv|new|news|nmiss|no|nobatch|nobs|nocaps|nocardimage|nocenter|nocharcode|nocmdmac|nocol|nocum|nodate|nodbcs|nodetails|nodmr|nodms|nodmsbatch|nodup|nodupkey|noduplicates|noechoauto|noequals|noerrorabend|noexitwindows|nofullstimer|noicon|noimplmac|noint|nolist|noloadlist|nomiss|nomlogic|nomprint|nomrecall|nomsgcase|nomstored|nomultenvappl|nonotes|nonumber|noobs|noovp|nopad|nopercent|noprint|noprintinit|normal|norow|norsasuser|nosetinit|nosource2|nosplash|nosymbolgen|note|notes|notitle|notitles|notsorted|noverbose|noxsync|noxwait|npv|null|number|numkeys|nummousekeys|nway|obs|ods|on|open|option|order|ordinal|otherwise|out|outer|outp=|output|over|ovp|p(1|5|10|25|50|75|90|95|99)|pad|pad2|page|pageno|pagesize|paired|parm|parmcards|path|pathdll|pathname|pdf|peek|peekc|pfkey|pmf|point|poisson|poke|position|printer|probbeta|probbnml|probchi|probf|probgam|probhypr|probit|probnegb|probnorm|probsig|probt|procleave|prt|ps|put|putc|putn|pw|pwreq|qtr|quote|r|ranbin|rancau|ranexp|rangam|range|ranks|rannor|ranpoi|rantbl|rantri|ranuni|read|recfm|register|regr|remote|remove|rename|repeat|replace|resolve|retain|return|reuse|reverse|rewind|right|round|rsquare|rtf|rtrace|rtraceloc|s|s2|samploc|sasautos|sascontrol|sasfrscr|sashelp|sasmsg|sasmstore|sasscript|sasuser|saving|scan|sdf|second|select|selection|separated|seq|serror|set|setcomm|setot|sign|simple|sin|sinh|siteinfo|skewness|skip|sle|sls|sortedby|sortpgm|sortseq|sortsize|soundex|source2|spedis|splashlocation|split|spool|sqrt|start|std|stderr|stdin|stfips|stimer|stname|stnamel|stop|stopover|subgroup|subpopn|substr|sum|sumwgt|symbol|symbolgen|symget|symput|sysget|sysin|sysleave|sysmsg|sysparm|sysprint|sysprintfont|sysprod|sysrc|system|t|table|tables|tan|tanh|tapeclose|tbufsize|terminal|test|then|timepart|tinv|title[1-9]?|tnonct|to|today|tol|tooldef|totper|transformout|translate|trantab|tranwrd|trigamma|trim|trimn|trunc|truncover|type|unformatted|uniform|union|until|upcase|update|user|usericon|uss|validate|value|var|varfmt|varinfmt|varlabel|varlen|varname|varnum|varray|varrayx|vartype|verify|vformat|vformatd|vformatdx|vformatn|vformatnx|vformatw|vformatwx|vformatx|vinarray|vinarrayx|vinformat|vinformatd|vinformatdx|vinformatn|vinformatnx|vinformatw|vinformatwx|vinformatx|vlabel|vlabelx|vlength|vlengthx|vname|vnamex|vnferr|vtype|vtypex|weekday|weight|when|where|while|wincharset|window|work|workinit|workterm|write|wsum|x|xsync|xwait|yearcutoff|yes|yyq|zipfips|zipname|zipnamel|zipstate))\b</string>
+			<string>;</string>
 			<key>name</key>
-			<string>support.function.sas</string>
+			<string>line.terminator.sas</string>
+		</dict>
+		<dict>
+			<key>include</key>
+			<string>#macrocall</string>
+		</dict>
+		<dict>
+			<key>include</key>
+			<string>#parameter-name</string>
+		</dict>
+		<dict>
+			<key>include</key>
+			<string>#starComment</string>
 		</dict>
 	</array>
 	<key>repository</key>
 	<dict>
 		<key>blockComment</key>
 		<dict>
-			<key>patterns</key>
-			<array>
-				<dict>
-					<key>begin</key>
-					<string>\/\*</string>
-					<key>end</key>
-					<string>\*\/</string>
-					<key>name</key>
-					<string>comment.block.slashstar.sas</string>
-				</dict>
-			</array>
+			<key>begin</key>
+			<string>\/\*</string>
+			<key>end</key>
+			<string>\*\/</string>
+			<key>name</key>
+			<string>comment.block.slashstar.sas</string>
 		</dict>
 		<key>constant</key>
 		<dict>
+			<key>comment</key>
+			<string>2015 switched to rpardee SAS syntax. Is very nicely done.</string>
 			<key>patterns</key>
 			<array>
 				<dict>
@@ -328,79 +194,6 @@
 				</dict>
 			</array>
 		</dict>
-		<key>dataSet</key>
-		<dict>
-			<key>patterns</key>
-			<array>
-				<dict>
-					<key>begin</key>
-					<string>((\w+)\.)?(\w+)\s?\(</string>
-					<key>beginCaptures</key>
-					<dict>
-						<key>2</key>
-						<dict>
-							<key>name</key>
-							<string>entity.name.class.libref.sas</string>
-						</dict>
-						<key>3</key>
-						<dict>
-							<key>name</key>
-							<string>entity.name.class.dsname.sas</string>
-						</dict>
-					</dict>
-					<key>comment</key>
-					<string>data set with options</string>
-					<key>end</key>
-					<string>\)</string>
-					<key>patterns</key>
-					<array>
-						<dict>
-							<key>include</key>
-							<string>#dataSetOptions</string>
-						</dict>
-						<dict>
-							<key>include</key>
-							<string>#blockComment</string>
-						</dict>
-						<dict>
-							<key>include</key>
-							<string>#macro</string>
-						</dict>
-						<dict>
-							<key>include</key>
-							<string>#constant</string>
-						</dict>
-						<dict>
-							<key>include</key>
-							<string>#quote</string>
-						</dict>
-						<dict>
-							<key>include</key>
-							<string>#operator</string>
-						</dict>
-					</array>
-				</dict>
-				<dict>
-					<key>captures</key>
-					<dict>
-						<key>2</key>
-						<dict>
-							<key>name</key>
-							<string>entity.name.class.libref.sas</string>
-						</dict>
-						<key>3</key>
-						<dict>
-							<key>name</key>
-							<string>entity.name.class.dsname.sas</string>
-						</dict>
-					</dict>
-					<key>comment</key>
-					<string>data set without options</string>
-					<key>match</key>
-					<string>\b((\w+)\.)?(\w+)\b</string>
-				</dict>
-			</array>
-		</dict>
 		<key>dataSetOptions</key>
 		<dict>
 			<key>patterns</key>
@@ -415,6 +208,8 @@
 		</dict>
 		<key>dateConstant</key>
 		<dict>
+			<key>comment</key>
+			<string>2015 switched to rpardee SAS syntax. Is very nicely done.</string>
 			<key>patterns</key>
 			<array>
 				<dict>
@@ -475,17 +270,485 @@
 				</dict>
 			</array>
 		</dict>
-		<key>macro</key>
+		<key>macrocall</key>
 		<dict>
 			<key>patterns</key>
 			<array>
 				<dict>
+					<key>captures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>support.class.sas</string>
+						</dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>support.function.macro.sas</string>
+						</dict>
+					</dict>
+					<key>comment</key>
+					<string>2015.12.06 added sysfunc and sysfuncf here</string>
 					<key>match</key>
-					<string>(&amp;+(?i:[a-z_]([a-z0-9_]+)?)(\.+)?)\b</string>
+					<string>(%)+(?i:(if|do|else|goto|end|then|local|global|to|until|while|by|sysfunc|sysfuncf))\b</string>
 					<key>name</key>
-					<string>variable.other.macro.sas</string>
+					<string>keyword.control.macro.sas</string>
+				</dict>
+				<dict>
+					<key>captures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>variable.language.control.sas</string>
+						</dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>keyword.emphasis.sas</string>
+						</dict>
+						<key>3</key>
+						<dict>
+							<key>name</key>
+							<string>keyword.operator.class.terminator.sas</string>
+						</dict>
+					</dict>
+					<key>comment</key>
+					<string>after excluding macro control tries to match calling to a compiled macro name. This has to be called after everything else. 2015.12.18 Moved paramname ahead of opencode 2016.02.11 added all macro functions from SAS Help (e.g., qlowcase) and aligned the non "macro call" (e.g., do, while, global) with ...#opencode-pct keywords</string>
+					<key>match</key>
+					<string>(?i:(%)(?!by|do|else|end|eval\b|global|goto|if|local|macro|mend|then|to|until|while|bquote|include|index|left|length|let|lowcase|nrbquote|nrquote|nrstr|put|qlowcase|qscan|qsubstr|qsysfunc|quote\b|qupcase|scan|str|substr|superq|symexist|symglobl|symlocal|sysevalf|sysfunc|sysget|sysmacexec|sysmacexist|sysmexecdepth|sysmexecname|sysprod|unquote|upcase)([A-Aa-z0-9_&amp;]+))</string>
+					<key>name</key>
+					<string>support.function.macrocall.sas</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#parameter-name</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#opencode-pct</string>
 				</dict>
 			</array>
+		</dict>
+		<key>metadatastep</key>
+		<dict>
+			<key>begin</key>
+			<string>^\s*\b(?i:(\bdata\b)\s++)([A-Za-z0-9_\.]+)\s*(;|\()</string>
+			<key>beginCaptures</key>
+			<dict>
+				<key>1</key>
+				<dict>
+					<key>name</key>
+					<string>entity.name.function.datastep.sas</string>
+				</dict>
+				<key>2</key>
+				<dict>
+					<key>name</key>
+					<string>support.class.sas</string>
+				</dict>
+			</dict>
+			<key>end</key>
+			<string>(?i:\b(run)\b\s*(;))</string>
+			<key>endCaptures</key>
+			<dict>
+				<key>1</key>
+				<dict>
+					<key>name</key>
+					<string>support.function.end</string>
+				</dict>
+				<key>2</key>
+				<dict>
+					<key>name</key>
+					<string>keyword.operator.class.terminator.sas</string>
+				</dict>
+			</dict>
+			<key>name</key>
+			<string>meta.datastep.sas</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>include</key>
+					<string>#starComment</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#blockComment</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#dataSetOptions</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#blockComment</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#constant</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#quote</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#operator</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#macrocall</string>
+				</dict>
+				<dict>
+					<key>captures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>entity.name.function.datastep.sas</string>
+						</dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>support.class.sas</string>
+						</dict>
+					</dict>
+					<key>match</key>
+					<string>\b(?i:(set|update|modify|merge)\s++)([A-Za-z0-9_\.]+)</string>
+					<key>name</key>
+					<string>keyword.control.datastep.sas</string>
+				</dict>
+			</array>
+		</dict>
+		<key>metamacro</key>
+		<dict>
+			<key>begin</key>
+			<string>(?i:((%)(macro\b\s+)([A-Za-z0-9_]+\b)?([^;]+)(;)))</string>
+			<key>beginCaptures</key>
+			<dict>
+				<key>2</key>
+				<dict>
+					<key>name</key>
+					<string>keyword.operator.class.macro.sas</string>
+				</dict>
+				<key>3</key>
+				<dict>
+					<key>name</key>
+					<string>support.class.sas</string>
+				</dict>
+				<key>4</key>
+				<dict>
+					<key>name</key>
+					<string>support.function.end</string>
+				</dict>
+				<key>5</key>
+				<dict>
+					<key>name</key>
+					<string>text.normal.sas</string>
+				</dict>
+				<key>6</key>
+				<dict>
+					<key>name</key>
+					<string>keyword.operator.class.terminator.sas</string>
+				</dict>
+			</dict>
+			<key>comment</key>
+			<string>2016.05.25 now captures across line breaks.</string>
+			<key>end</key>
+			<string>(?i:)(%)+(mend\b)+(\s[A-Za-z0-9_\.]+)?(;)</string>
+			<key>endCaptures</key>
+			<dict>
+				<key>1</key>
+				<dict>
+					<key>name</key>
+					<string>keyword.operator.class.macro.sas</string>
+				</dict>
+				<key>2</key>
+				<dict>
+					<key>name</key>
+					<string>support.class.sas</string>
+				</dict>
+				<key>3</key>
+				<dict>
+					<key>name</key>
+					<string>support.function.end</string>
+				</dict>
+				<key>4</key>
+				<dict>
+					<key>name</key>
+					<string>keyword.operator.class.terminator.sas</string>
+				</dict>
+			</dict>
+			<key>name</key>
+			<string>meta.macro.sas</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>include</key>
+					<string>#starComment</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#blockComment</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#macrocall</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#parameter-name</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#metasql</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#sas-stuff</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#quote</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#operator</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#constant</string>
+				</dict>
+				<dict>
+					<key>captures</key>
+					<dict>
+						<key>0</key>
+						<dict>
+							<key>name</key>
+							<string>punctuation.definition.comment.sas</string>
+						</dict>
+					</dict>
+					<key>comment</key>
+					<string>SAS crappy format for recognizing line comments in macros</string>
+					<key>match</key>
+					<string>^\s*%\*.*;$</string>
+					<key>name</key>
+					<string>comment.line.macro.sas</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#metasql</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#metadatastep</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#metaproc</string>
+				</dict>
+			</array>
+		</dict>
+		<key>metaproc</key>
+		<dict>
+			<key>begin</key>
+			<string>\b(?i:(proc)\s+(\w++)\b)</string>
+			<key>beginCaptures</key>
+			<dict>
+				<key>1</key>
+				<dict>
+					<key>name</key>
+					<string>entity.name.function.proc.sas</string>
+				</dict>
+				<key>2</key>
+				<dict>
+					<key>name</key>
+					<string>support.class.sas</string>
+				</dict>
+			</dict>
+			<key>end</key>
+			<string>(?i:\b(run|quit)\b\s*(;))</string>
+			<key>endCaptures</key>
+			<dict>
+				<key>1</key>
+				<dict>
+					<key>name</key>
+					<string>support.function.end</string>
+				</dict>
+				<key>2</key>
+				<dict>
+					<key>name</key>
+					<string>keyword.operator.class.terminator.sas</string>
+				</dict>
+			</dict>
+			<key>name</key>
+			<string>meta.proc.sas</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>include</key>
+					<string>#starComment</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#blockComment</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#macrocall</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#sas-stuff</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#quote</string>
+				</dict>
+			</array>
+		</dict>
+		<key>metasql</key>
+		<dict>
+			<key>begin</key>
+			<string>\b(?i:(proc)\s+(sql)\b)</string>
+			<key>beginCaptures</key>
+			<dict>
+				<key>1</key>
+				<dict>
+					<key>name</key>
+					<string>entity.name.function.proc.sas</string>
+				</dict>
+				<key>2</key>
+				<dict>
+					<key>name</key>
+					<string>support.class.sas</string>
+				</dict>
+			</dict>
+			<key>comment</key>
+			<string>matches proc step. List source.sql before SAS-stuff to apply SQL syntax before SAS. 2016.02.02 Added \b to quit</string>
+			<key>end</key>
+			<string>(?i:\b(quit)\b\s*(;))</string>
+			<key>endCaptures</key>
+			<dict>
+				<key>1</key>
+				<dict>
+					<key>name</key>
+					<string>support.function.end</string>
+				</dict>
+				<key>2</key>
+				<dict>
+					<key>name</key>
+					<string>keyword.operator.class.terminator.sas</string>
+				</dict>
+			</dict>
+			<key>name</key>
+			<string>meta.procsql.sas</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>include</key>
+					<string>source.sql</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#starComment</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#blockComment</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#constant</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#quote</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#operator</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#macrocall</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#metamacro</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>(?i:(\bis\b\s(\bnot\s*)?(null|missing)))</string>
+					<key>name</key>
+					<string>keyword.operator.null.sas</string>
+				</dict>
+				<dict>
+					<key>captures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>variable.language.connection.sas</string>
+						</dict>
+						<key>3</key>
+						<dict>
+							<key>name</key>
+							<string>variable.language.connection.II.sas</string>
+						</dict>
+						<key>4</key>
+						<dict>
+							<key>name</key>
+							<string>keyword.control.connection.sas</string>
+						</dict>
+					</dict>
+					<key>match</key>
+					<string>(?i:((dis)?connect\b\s+(from|to)\b\s)+((\bas\b\s+)?\w++\b))</string>
+					<key>name</key>
+					<string>support.function.connect.sas</string>
+				</dict>
+				<dict>
+					<key>captures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>variable.language.connection.sas</string>
+						</dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>keyword.emphasis.connection.sas</string>
+						</dict>
+					</dict>
+					<key>match</key>
+					<string>(?i:(\bconnection\b\s+\bto\b\s+)+(\w++\b))</string>
+					<key>name</key>
+					<string>support.function.fromconnection.sas</string>
+				</dict>
+			</array>
+		</dict>
+		<key>opencode-pct</key>
+		<dict>
+			<key>captures</key>
+			<dict>
+				<key>1</key>
+				<dict>
+					<key>name</key>
+					<string>variable.language.control.sas</string>
+				</dict>
+				<key>2</key>
+				<dict>
+					<key>name</key>
+					<string>support.class.sas</string>
+				</dict>
+			</dict>
+			<key>comment</key>
+			<string>2016.02.11 Added all macro functions I could find. See</string>
+			<key>match</key>
+			<string>(%)(?i:(bquote|eval|include|index|left|length|let|lowcase|nrbquote|nrquote|nrstr|put|qlowcase|qscan|qsubstr|qsysfunc|quote|qupcase|scan|str|substr|superq|symexist|symexist|symglobl|symlocal|sysevalf|sysfunc|sysget|sysmacexec|sysmacexist|sysmexecdepth|sysmexecname|sysprod|unquote|upcase))\b</string>
+			<key>name</key>
+			<string>support.function.opencode.sas</string>
 		</dict>
 		<key>operator</key>
 		<dict>
@@ -498,42 +761,129 @@
 					<string>keyword.operator.arithmetic.sas</string>
 				</dict>
 				<dict>
+					<key>comment</key>
+					<string>2015.12.18 NLM removed ampersand from rpardee because was catching macro param names because it is called before</string>
 					<key>match</key>
-					<string>\b(?i:(eq|ne|gt|lt|ge|le|in|not|&amp;|and|or|min|max))\b</string>
+					<string>\b(?i:(eq|ne|gt|lt|ge|le|in|not|and|or|min|max))\b</string>
 					<key>name</key>
-					<string>keyword.operator.comparison.sas</string>
+					<string>keyword.operator.comparison.I.sas</string>
 				</dict>
 				<dict>
 					<key>match</key>
-					<string>([¬&lt;&gt;^~]?=(:)?|&gt;|&lt;|\||!|¦|¬|^|~|&lt;&gt;|&gt;&lt;|\|\|)</string>
+					<string>[!&lt;&gt;]?=|&lt;&gt;|&lt;|&gt;</string>
 					<key>name</key>
-					<string>keyword.operator.sas</string>
+					<string>keyword.operator.comparison.II.sas</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>\|\|</string>
+					<key>name</key>
+					<string>keyword.operator.concatenator.sas</string>
+				</dict>
+				<dict>
+					<key>comment</key>
+					<string>Changes vs rpardee Exclude SQL keywords (relying on improved SQL highlighting or Postgres/MSSQL-specific)</string>
+					<key>match</key>
+					<string>\b(?i:(_all_|_character_|_cmd_|_freq_|_i_|_infile_|_last_|_msg_|_null_|_numeric_|_temporary_|_type_|abort|abs|addr|adjrsq|airy|alpha|alter|altlog|altprint|and|arcos|array|arsin|as|atan|attrc|attrib|attrn|authserver|autoexec|awscontrol|awsdef|awsmenu|awsmenumerge|awstitle|backward|band|base|betainv|between|blocksize|blshift|bnot|bor|brshift|bufno|bufsize|bxor|by|byerr|byline|byte|calculated|call|cards|cards4|catcache|cbufno|cdf|ceil|center|cexist|change|chisq|cinv|class|cleanup|close|cnonct|cntllev|coalesce|codegen|col|collate|collin|column|comamid|comaux1|comaux2|comdef|compbl|compound|compress|config|continue|convert|cos|cosh|cpuid|cross|crosstab|css|curobs|cv|daccdb|daccdbsl|daccsl|daccsyd|dacctab|dairy|datalines|datalines4|datejul|datepart|datetime|day|dbcslang|dbcstype|dclose|ddm|delete|delimiter|depdb|depdbsl|depsl|depsyd|deptab|dequote|descending|descript|design=|device|dflang|dhms|dif|digamma|dim|dinfo|display|dkricond|dkrocond|dlm|dnum|do|dopen|doptname|doptnum|dread|drop|dropnote|dsname|dsnferr|echo|else|emaildlg|emailid|emailpw|emailserver|emailsys|encrypt|end|endsas|engine|eof|eov|erf|erfc|error|errorcheck|errors|exist|exp|fappend|fclose|fcol|fdelete|feedback|fetch|fetchobs|fexist|fget|file|fileclose|fileexist|filefmt|filename|fileref|filevar|finfo|finv|fipname|fipnamel|fipstate|first|firstobs|floor|fmterr|fmtsearch|fnonct|fnote|font|fontalias|footnote|footnote1|footnote2|footnote3|footnote4|footnote5|footnote6|footnote7|footnote8|footnote9|fopen|foptname|foptnum|force|formatted|formchar|formdelim|formdlim|forward|fpoint|fpos|fput|fread|frewind|frlen|fsep|fuzz|fwrite|gaminv|gamma|getoption|getvarc|getvarn|go|group|gwindow|hbar|hbound|helpenv|helploc|hms|honorappearance|hosthelp|hostprint|hour|hpct|html|hvar|ibessel|ibr|id|if|indexc|indexw|initcmd|initstmt|inner|input|inputc|inputn|inr|insert|int|intck|intnx|into|intrr|invaliddata|irr|is|jbessel|juldate|keep|kentb|kurtosis|label|lag|last|lbound|leave|left|length|levels|lgamma|lib|libname|library|libref|line|linesize|link|list|log|log10|log2|logpdf|logpmf|logsdf|lostcard|lowcase|lrecl|ls|macrogen|maps|mautosource|max|maxdec|maxr|mdy|mean|measures|median|memtype|merge|merror|min|minute|missover|mlogic|mod|mode|model|modify|month|mopen|mort|mprint|mrecall|msglevel|msymtabmax|mvarsize|myy|n|nest|netpv|new|news|nmiss|no|nobatch|nobs|nocaps|nocardimage|nocenter|nocharcode|nocmdmac|nocol|nocum|nodate|nodbcs|nodetails|nodmr|nodms|nodmsbatch|nodup|nodupkey|noduplicates|noechoauto|noequals|noerrorabend|noexitwindows|nofullstimer|noicon|noimplmac|noint|nolist|noloadlist|nomiss|nomlogic|nomprint|nomrecall|nomsgcase|nomstored|nomultenvappl|nonotes|nonumber|noobs|noovp|nopad|noprint|noprintinit|normal|norow|norsasuser|nosetinit|nosource2|nosplash|nosymbolgen|note|notes|notitle|notitles|notsorted|noverbose|noxsync|noxwait|npv|null|number|numkeys|nummousekeys|nway|obs|ods|open|option|or|order|ordinal|otherwise|out|outer|outp=|output|over|ovp|pad|pad2|page|pageno|pagesize|paired|parm|parmcards|path|pathdll|pathname|pdf|peek|peekc|pfkey|pmf|point|poisson|poke|position|printer|probbeta|probbnml|probchi|probf|probgam|probhypr|probit|probnegb|probnorm|probsig|probt|procleave|prt|ps|put|putc|putn|pw|pwreq|qtr|quote|r|ranbin|rancau|ranexp|rangam|range|ranks|rannor|ranpoi|rantbl|rantri|ranuni|read|recfm|register|regr|remote|remove|rename|repeat|replace|resolve|retain|return|reuse|reverse|rewind|right|round|rsquare|rtf|rtrace|rtraceloc|s|s2|samploc|sasautos|sascontrol|sasfrscr|sashelp|sasmsg|sasmstore|sasscript|sasuser|saving|scan|sdf|second|selection|separated|seq|serror|setcomm|setot|sign|simple|sin|sinh|siteinfo|skewness|skip|sle|sls|sortedby|sortpgm|sortseq|sortsize|soundex|source2|spedis|splashlocation|split|spool|sqrt|start|std|stderr|stdin|stfips|stimer|stname|stnamel|stop|stopover|subgroup|subpopn|substr|sum|sumwgt|symbol|symbolgen|symget|symput|sysget|sysin|sysleave|sysmsg|sysparm|sysprint|sysprintfont|sysprod|sysrc|system|t|tables|tan|tanh|tapeclose|tbufsize|terminal|test|then|timepart|tinv|title|title1|title2|title3|title4|title5|title6|title7|title8|title9|tnonct|to|today|tol|tooldef|totper|transformout|translate|trantab|tranwrd|trigamma|trim|trimn|trunc|truncover|type|unformatted|uniform|until|upcase|update|user|usericon|uss|validate|value|var|varfmt|varinfmt|varlabel|varlen|varname|varnum|varray|varrayx|vartype|verify|vformat|vformatd|vformatdx|vformatn|vformatnx|vformatw|vformatwx|vformatx|vinarray|vinarrayx|vinformat|vinformatd|vinformatdx|vinformatn|vinformatnx|vinformatw|vinformatwx|vinformatx|vlabel|vlabelx|vlength|vlengthx|vname|vnamex|vnferr|vtype|vtypex|weight|when|where|while|wincharset|window|workinit|workterm|write|wsum|xsync|xwait|yearcutoff|yes|yyq|zipfips|zipname|zipnamel|zipstate))\b</string>
+					<key>name</key>
+					<string>keyword.other.sas</string>
 				</dict>
 			</array>
 		</dict>
+		<key>parameter-name</key>
+		<dict>
+			<key>comment</key>
+			<string>this has to be called before AND after support.function.opencode. NLM removed space to capture macro params embedded in larger string (or multiple params strung together)</string>
+			<key>match</key>
+			<string>(&amp;\w+)</string>
+			<key>name</key>
+			<string>variable.parameter.macro.sas</string>
+		</dict>
 		<key>quote</key>
 		<dict>
+			<key>comment</key>
+			<string>Using rpardee repository name, but using SQL-style logic for quotes.</string>
 			<key>patterns</key>
 			<array>
 				<dict>
-					<key>begin</key>
-					<string>(')</string>
-					<key>comment</key>
-					<string>single quoted string block</string>
-					<key>end</key>
-					<string>(')(?!\w+)</string>
+					<key>captures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>punctuation.definition.string.begin.sas</string>
+						</dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>punctuation.definition.string.end.sas</string>
+						</dict>
+					</dict>
+					<key>match</key>
+					<string>(')[^'\\]*(')</string>
 					<key>name</key>
 					<string>string.quoted.single.sas</string>
 				</dict>
 				<dict>
-					<key>begin</key>
-					<string>(")</string>
-					<key>comment</key>
-					<string>double quoted string block</string>
-					<key>end</key>
-					<string>(")(?!\w+)</string>
+					<key>captures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>punctuation.definition.string.begin.sas</string>
+						</dict>
+						<key>3</key>
+						<dict>
+							<key>name</key>
+							<string>punctuation.definition.string.end.sas</string>
+						</dict>
+					</dict>
+					<key>match</key>
+					<string>(")[^"#]*(")</string>
 					<key>name</key>
 					<string>string.quoted.double.sas</string>
+				</dict>
+			</array>
+		</dict>
+		<key>sas-stuff</key>
+		<dict>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>match</key>
+					<string>\b(?i:(options))\b</string>
+					<key>name</key>
+					<string>support.function.options.sas</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>(?i:((monname|qtr|weekday|day|month|year|julday|worddate|pdjulg|pdjuli|date|dtdate|dtmonyy|julian|yymon|(ddmmyy|mmddyy|yymmdd|yyq|mmyy|yymm)[bcdnps]?))(?:\d+)?\.)</string>
+					<key>name</key>
+					<string>constant.numeric.dateformat.I.sas</string>
+				</dict>
+				<dict>
+					<key>captures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>support.function.dataset.sas</string>
+						</dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>keyword.operator.comparison.II.sas</string>
+						</dict>
+						<key>3</key>
+						<dict>
+							<key>name</key>
+							<string>support.type.dataset.sas</string>
+						</dict>
+					</dict>
+					<key>match</key>
+					<string>(?i:(\bdata\b)(\s*\=\s*)+([A-Za-z0-9_\.]++)\b)</string>
+					<key>name</key>
+					<string>support.function.dataset.sas</string>
 				</dict>
 			</array>
 		</dict>
@@ -567,6 +917,6 @@
 	<key>scopeName</key>
 	<string>source.sas</string>
 	<key>uuid</key>
-	<string>7e721b1e-6265-4865-bc4b-308d49affba1</string>
+	<string>4f24b67d-429e-4053-b6d5-218ffdadf52d</string>
 </dict>
 </plist>
