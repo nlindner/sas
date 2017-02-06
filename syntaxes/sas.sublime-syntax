@@ -235,7 +235,7 @@ contexts:
   opencode-sas:
     - match: \b(?i:(options))\b
       scope: support.function.options.sas
-    - match: '(?i:((monname|qtr|weekday|day|month|year|julday|worddate|pdjulg|pdjuli|date|dtdate|dtmonyy|julian|yymon|(ddmmyy|mmddyy|yymmdd|yyq|mmyy|yymm)[bcdnps]?))(?:\d+)?\.)'
+    - match: '(?i:((monname|qtr|weekday|day|month|year|julday|worddate|pdjulg|pdjuli|date|dtdate|dtmonyy|julian|yymon|datetime|anydtdtm|anydtdte|anydtdtme|(ddmmyy|mmddyy|yymmdd|yyq|mmyy|yymm)[bcdnps]?))(?:\d+)?\.)'
       scope: constant.numeric.dateformat.I.sas
   operator:
     - match: '([\+\-\*\^\/])'
@@ -301,8 +301,9 @@ contexts:
         1: support.function.dataset.sas
         2: keyword.operator.comparison.II.sas
         3: support.type.dataset.sas
-    - match: (?i:\b(by|label|format)\b)
+    - match: (?i:\b(by|label|format|infile|informat)\b)
       scope: keyword.datastep.sas
+    - include: opencode-sas
   starComment:
     - include: blockComment
     - match: '(?<=;)[\s%]*\*'
