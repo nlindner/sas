@@ -13,7 +13,6 @@ patterns:
 - include: '#parameter-name'
 - include: '#macrocall'
 
-# 2017.01.15 NLM. Ideally would separate out these keywords between allowed in datastep vs. not.
 - include: '#sas-stuff'
 
 - include: '#metamacro'
@@ -46,7 +45,6 @@ patterns:
 
 repository:
   quote:
-    comment: 2017.01.14 aligned with rpardee, who did nice fix on quote parsing
     patterns:
       - comment: single quoted string block
         begin: (')
@@ -57,24 +55,20 @@ repository:
         end: (")([bx])?
         name: string.quoted.double.sas
       - include: '#parameter-name'
-        comment: 2017.01.14 NLM added
-        
   blockComment:
     patterns:
       - begin: \/\*
         end: \*\/
         name: comment.block.slashstar.sas
-    
   starComment:
     patterns:
-      - include: '#blockcomment'
+      - include: '#blockComment'
       - name: comment.line.inline.star.sas
         begin: (?<=;)[\s%]*\*
         end: ;
       - name: comment.line.start.sas
         begin: ^[\s%]*\*
         end: ;
-        
   macrocall:
     patterns:
       - name: keyword.control.macro.sas
@@ -95,34 +89,26 @@ repository:
       - include: '#parameter-name'
       - include: '#opencode-macrofunction'
 
-
   opencode-macrofunction:
     name: support.function.opencode.sas
-    comment: 2017.01.15 NLindner renamed and added more keywords. This includes all macro functions that are legal everywhere. Note that keyword.controlmacro.sas in macrocall contains keywords that are only legal within macro blocks
     match: (%)(?i:(abort|bquote|copy|compress|display|eval|include|index|left|length|let|list|lowcase|nrbquote|nrquote|nrstr|put|qleft|qlowcase|qscan|qsubstr|qsysfunc|qtrim|quote|qupcase|return|scan|str|substr|superq|symexist|symexist|symglobl|symlocal|syscall|sysevalf|sysfunc|sysget|sysmacexec|sysmacexist|sysmexecdepth|sysmexecname|sysprod|sysrc|sysrput|trim|unquote|upcase|verify))\b
     captures:
       '1': {name: variable.language.control.sas}
       '2': {name: support.class.sas}
     comment: 2014.10.26 changed this to add a \b at end so that macros that begin like these are not captured
     comment: 2016.02.11 Added all macro functions I could find. See #macrocall section capturing variable.language.control.sas
-
-
   parameter-name:
     patterns:
       - name: variable.parameter.macro.sas
         match: (&[\w\.]+)
-        comment: 2017.01.15 added optional period for parameter defs
         comment: this has to be called before AND after support.function.opencode. NLM removed space to capture macro params embedded in larger string (or multiple params strung together)
       - name: variable.parameter.macro.nested.sas
         match: (&)(?=&)
         comment: add highlighting to nested parameter evaluation.
         captures: 
           '2': {name: variable.parameter.macro.sas}
-
-
   constant:
     comment: 2015 switched to rpardee SAS syntax. Is very nicely done.
-    comment: 2017.01.15 Checked whether to align with rPardee, but I like macro params being scoped within quotes
     patterns:
       - include: '#dateConstant'
       - name: constant.numeric.sas
@@ -149,16 +135,15 @@ repository:
       - name: constant.other.catchothers.macro.sas
         comment: double quoted catchall for fallout
         match: (?i:(")([a-z0-9_\.&]+)(")([xbn]|d|t|dt))\b        
-
   dateConstant:
     comment: 2015 switched to rpardee SAS syntax. Is very nicely done.
     patterns:
       - name: constant.numeric.date.single.sas
         comment: single quote date constant
-        match: (')(\d{1,2}(?i:(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec))\d{2,4})(')([dD])\b
+        match: (')(\d{1,2}-?(?i:(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec))-?\d{2,4})(')([dD])\b
       - name: constant.numeric.date.double.sas
         comment: double quote date constant
-        match: (")(\d{1,2}(?i:(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec))\d{2,4})(")([dD])\b
+        match: (")(\d{1,2}-?(?i:(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec))-?\d{2,4})(")([dD])\b
       - name: constant.numeric.time.single.sas
         comment: single quote time constant
         match: (')(\d{1,2}:\d{1,2}(:\d{1,2}(\.\d+)?)?([aApP][mM])?)(')([tT])\b
@@ -168,7 +153,6 @@ repository:
       - name: constant.numeric.datetime.single.sas
         comment: single quote datetime constant
         match: (')(\d{1,2}(?i:(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec))\d{2,4}:\d{1,2}:\d{1,2}(:\d{1,2}(\.\d+)?)?([aApP][mM])?)(')([dD][tT])\b
-        
       - name: constant.numeric.datetime.single.sas
         comment: double quote datetime constant
         match: (")(\d{1,2}(?i:(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec))\d{2,4}:\d{1,2}:\d{1,2}(:\d{1,2}(\.\d+)?)?([aApP][mM])?)(")([dD][tT])\b
@@ -176,7 +160,6 @@ repository:
       - name: constant.numeric.macrodte.double.sas
         comment: double quote macro variable date constant
         match: (")(&+(?i:[a-z_]([a-z0-9_]+)?)(\.+)?)(")(?i:(d|t|dt))\b
-
   operator:
     patterns:
       - name: keyword.operator.arithmetic.sas
@@ -190,7 +173,6 @@ repository:
         match: \|\|
       - name: keyword.operator.sas
         match: ([¬<>^~]?=(:)?|>|<|\||!|¦|¬|^|~|<>|><|\|\|)
-
   opencode-sas:
     patterns: 
       - name: support.function.options.sas
@@ -198,16 +180,13 @@ repository:
       - name: constant.numeric.dateformat.I.sas
         #comment: storage.modifier.dateformat.I.sas
         match: (?i:((monname|qtr|weekday|day|month|year|julday|worddate|pdjulg|pdjuli|date|dtdate|dtmonyy|julian|yymon|(ddmmyy|mmddyy|yymmdd|yyq|mmyy|yymm)[bcdnps]?))(?:\d+)?\.)
-
   sas-stuff:
     patterns:
       - name: support.function.sas
-        match: \b(?i:(_all_|_character_|_cmd_|_freq_|_i_|_infile_|_last_|_msg_|_n_|_new_|_null_|_numeric_|_temporary_|_type_|abort|abs|addr|adjrsq|airy|alpha|alter|altlog|altprint|and|arcos|array|arsin|as|atan|attrc|attrib|attrn|authserver|autoexec|awscontrol|awsdef|awsmenu|awsmenumerge|awstitle|backward|band|base|betainv|between|blocksize|blshift|bnot|bor|brshift|bufno|bufsize|bxor|by|byerr|byline|byte|calculated|call|cards|cards4|catcache|cbufno|cdf|ceil|center|cexist|change|chisq|cinv|class|cleanup|close|cnonct|cntllev|coalesce|codegen|col|collate|collin|column|comamid|comaux1|comaux2|comdef|compbl|compound|compress|config|continue|convert|cos|cosh|cpuid|create|cross|crosstab|css|curobs|cv|daccdb|daccdbsl|daccsl|daccsyd|dacctab|dairy|datalines|datalines4|datejul|datepart|datetime|day|dbcslang|dbcstype|dclose|ddm|delete|delimiter|depdb|depdbsl|depsl|depsyd|deptab|dequote|descending|descript|design=|device|dflang|dhms|dif|digamma|dim|dinfo|display|distinct|dkricond|dkrocond|dlm|dnum|do|dopen|doptname|doptnum|dread|drop|dropnote|dsname|dsnferr|echo|else|emaildlg|emailid|emailpw|emailserver|emailsys|encrypt|end|endsas|engine|eof|eov|erf|erfc|error|errorcheck|errors|exist|exp|fappend|fclose|fcol|fdelete|feedback|fetch|fetchobs|fexist|fget|file|fileclose|fileexist|filefmt|filename|fileref|filevar|finfo|finv|fipname|fipnamel|fipstate|first|firstobs|floor|fmterr|fmtsearch|fnonct|fnote|font|fontalias|footnote[1-9]?|fopen|foptname|foptnum|force|formatted|formchar|formdelim|formdlim|forward|fpoint|fpos|fput|fread|frewind|frlen|from|fsep|fuzz|fwrite|gaminv|gamma|getoption|getvarc|getvarn|go|goto|group|gwindow|hbar|hbound|helpenv|helploc|hms|honorappearance|hosthelp|hostprint|hour|hpct|html|hvar|ibessel|ibr|id|if|index|indexc|indexw|initcmd|initstmt|inner|input|inputc|inputn|inr|insert|int|intck|intnx|into|intrr|invaliddata|irr|is|jbessel|join|juldate|keep|kentb|kurtosis|label|lag|last|lbound|leave|left|length|levels|lgamma|lib|libname|library|libref|line|linesize|link|list|log|log10|log2|logpdf|logpmf|logsdf|lostcard|lowcase|lrecl|ls|macro|macrogen|maps|mautosource|max|maxdec|maxr|mdy|mean|measures|median|memtype|merge|merror|min|minute|missing|missover|mlogic|mod|mode|model|modify|month|mopen|mort|mprint|mrecall|msglevel|msymtabmax|mvarsize|myy|n|nest|netpv|new|news|nmiss|no|nobatch|nobs|nocaps|nocardimage|nocenter|nocharcode|nocmdmac|nocol|nocum|nodate|nodbcs|nodetails|nodmr|nodms|nodmsbatch|nodup|nodupkey|noduplicates|noechoauto|noequals|noerrorabend|noexitwindows|nofullstimer|noicon|noimplmac|noint|nolist|noloadlist|nomiss|nomlogic|nomprint|nomrecall|nomsgcase|nomstored|nomultenvappl|nonotes|nonumber|noobs|noovp|nopad|nopercent|noprint|noprintinit|normal|norow|norsasuser|nosetinit|nosource2|nosplash|nosymbolgen|note|notes|notitle|notitles|notsorted|noverbose|noxsync|noxwait|npv|null|number|numkeys|nummousekeys|nway|obs|ods|on|open|option|order|ordinal|otherwise|out|outer|outp=|output|over|ovp|p(1|5|10|25|50|75|90|95|99)|pad|pad2|page|pageno|pagesize|paired|parm|parmcards|path|pathdll|pathname|pdf|peek|peekc|pfkey|pmf|point|poisson|poke|position|printer|probbeta|probbnml|probchi|probf|probgam|probhypr|probit|probnegb|probnorm|probsig|probt|procleave|prt|ps|put|putc|putn|pw|pwreq|qtr|quote|r|ranbin|rancau|ranexp|rangam|range|ranks|rannor|ranpoi|rantbl|rantri|ranuni|read|recfm|register|regr|remote|remove|rename|repeat|replace|resolve|retain|return|reuse|reverse|rewind|right|round|rsquare|rtf|rtrace|rtraceloc|s|s2|samploc|sasautos|sascontrol|sasfrscr|sashelp|sasmsg|sasmstore|sasscript|sasuser|saving|scan|sdf|second|select|selection|separated|seq|serror|set|setcomm|setot|sign|simple|sin|sinh|siteinfo|skewness|skip|sle|sls|sortedby|sortpgm|sortseq|sortsize|soundex|source2|spedis|splashlocation|split|spool|sqrt|start|std|stderr|stdin|stfips|stimer|stname|stnamel|stop|stopover|subgroup|subpopn|substr|sum|sumwgt|symbol|symbolgen|symget|symput|sysget|sysin|sysleave|sysmsg|sysparm|sysprint|sysprintfont|sysprod|sysrc|system|t|table|tables|tan|tanh|tapeclose|tbufsize|terminal|test|then|timepart|tinv|title[1-9]?|tnonct|to|today|tol|tooldef|totper|transformout|translate|trantab|tranwrd|trigamma|trim|trimn|trunc|truncover|type|unformatted|uniform|union|until|upcase|update|user|usericon|uss|validate|value|var|varfmt|varinfmt|varlabel|varlen|varname|varnum|varray|varrayx|vartype|verify|vformat|vformatd|vformatdx|vformatn|vformatnx|vformatw|vformatwx|vformatx|vinarray|vinarrayx|vinformat|vinformatd|vinformatdx|vinformatn|vinformatnx|vinformatw|vinformatwx|vinformatx|vlabel|vlabelx|vlength|vlengthx|vname|vnamex|vnferr|vtype|vtypex|weekday|weight|when|where|while|wincharset|window|work|workinit|workterm|write|wsum|x|xsync|xwait|yearcutoff|yes|yyq|zipfips|zipname|zipnamel|zipstate))\b
+        match: \b(?i:(_all_|_character_|_cmd_|_freq_|_i_|_infile_|_last_|_msg_|_n_|_new_|_null_|_numeric_|_temporary_|_type_|abort|abs|addr|adjrsq|airy|alpha|alter|altlog|altprint|and|arcos|array|arsin|as|atan|attrc|attrib|attrn|authserver|autoexec|awscontrol|awsdef|awsmenu|awsmenumerge|awstitle|backward|band|base|betainv|between|blocksize|blshift|bnot|bor|brshift|bufno|bufsize|bxor|by|byerr|byline|byte|calculated|call|cards|cards4|catcache|cbufno|cdf|ceil|center|cexist|change|chisq|cinv|class|cleanup|close|cnonct|cntllev|coalesce|codegen|col|collate|collin|column|comamid|comaux1|comaux2|comdef|compbl|compound|compress|config|continue|convert|cos|cosh|cpuid|create|cross|crosstab|css|curobs|cv|daccdb|daccdbsl|daccsl|daccsyd|dacctab|dairy|datalines|datalines4|datejul|datepart|datetime|day|dbcslang|dbcstype|dclose|ddm|delete|delimiter|depdb|depdbsl|depsl|depsyd|deptab|dequote|descending|descript|design=|device|dflang|dhms|dif|digamma|dim|dinfo|display|distinct|dkricond|dkrocond|dlm|dnum|do|dopen|doptname|doptnum|dread|drop|dropnote|dsname|dsnferr|echo|else|emaildlg|emailid|emailpw|emailserver|emailsys|encrypt|end|endsas|engine|eof|eov|erf|erfc|error|errorcheck|errors|exist|exp|fappend|fclose|fcol|fdelete|feedback|fetch|fetchobs|fexist|fget|file|fileclose|fileexist|filefmt|filename|fileref|filevar|finfo|finv|fipname|fipnamel|fipstate|first|firstobs|floor|fmterr|fmtsearch|fnonct|fnote|font|fontalias|footnote[1-9]?|fopen|foptname|foptnum|force|formatted|formchar|formdelim|formdlim|forward|fpoint|fpos|fput|fread|frewind|frlen|from|fsep|fuzz|fwrite|gaminv|gamma|getoption|getvarc|getvarn|go|goto|group|gwindow|hbar|hbound|helpenv|helploc|hms|honorappearance|hosthelp|hostprint|hour|hpct|html|hvar|ibessel|ibr|id|if|index|indexc|indexw|initcmd|initstmt|inner|input|inputc|inputn|inr|insert|int|intck|intnx|into|intrr|invaliddata|irr|is|jbessel|join|juldate|keep|kentb|kurtosis|label|lag|last|lbound|leave|left|length|levels|lgamma|lib|libname|library|libref|line|linesize|link|list|log|log10|log2|logpdf|logpmf|logsdf|lostcard|lowcase|lrecl|ls|macro|macrogen|maps|mautosource|max|maxdec|maxr|mdy|mean|measures|median|memtype|merge|merror|min|minute|missing|missover|mlogic|mod|mode|model|modify|month|mopen|mort|mprint|mrecall|msglevel|msymtabmax|mvarsize|myy|n|nest|netpv|new|news|nmiss|no|nobatch|nobs|nocaps|nocardimage|nocenter|nocharcode|nocmdmac|nocol|nocum|nodate|nodbcs|nodetails|nodmr|nodms|nodmsbatch|nodup|nodupkey|noduplicates|noechoauto|noequals|noerrorabend|noexitwindows|nofullstimer|noicon|noimplmac|noint|nolist|noloadlist|nomiss|nomlogic|nomprint|nomrecall|nomsgcase|nomstored|nomultenvappl|nonotes|nonumber|noobs|noovp|nopad|nopercent|noprint|noprintinit|normal|norow|norsasuser|nosetinit|nosource2|nosplash|nosymbolgen|note|notes|notitle|notitles|notsorted|noverbose|noxsync|noxwait|npv|null|number|numkeys|nummousekeys|nway|obs|ods|on|open|option|order|ordinal|otherwise|out|outer|outp=|output|over|ovp|p(1|5|10|25|50|75|90|95|99)|pad|pad2|page|pageno|pagesize|paired|parm|parmcards|path|pathdll|pathname|pdf|peek|peekc|pfkey|pmf|point|poisson|poke|position|printer|probbeta|probbnml|probchi|probf|probgam|probhypr|probit|probnegb|probnorm|probsig|probt|procleave|prt|ps|put|putc|putn|pw|pwreq|qtr|quote|r|ranbin|rancau|ranexp|rangam|range|ranks|rannor|ranpoi|rantbl|rantri|ranuni|read|recfm|register|regr|remote|remove|rename|repeat|replace|resolve|retain|return|reuse|reverse|rewind|right|round|rsquare|rtf|rtrace|rtraceloc|s|s2|samploc|sasautos|sascontrol|sasfrscr|sashelp|sasmsg|sasmstore|sasscript|sasuser|saving|scan|sdf|second|select|selection|separated|seq|serror|set|setcomm|setot|sign|simple|sin|sinh|siteinfo|skewness|skip|sle|sls|sortedby|sortpgm|sortseq|sortsize|soundex|source2|spedis|splashlocation|split|spool|sqrt|start|std|stderr|stdin|stfips|stimer|stname|stnamel|stop|stopover|strip|subgroup|subpopn|substr|sum|sumwgt|symbol|symbolgen|symget|symput|sysget|sysin|sysleave|sysmsg|sysparm|sysprint|sysprintfont|sysprod|sysrc|system|t|table|tables|tan|tanh|tapeclose|tbufsize|terminal|test|then|timepart|tinv|title[1-9]?|tnonct|to|today|tol|tooldef|totper|transformout|translate|trantab|tranwrd|trigamma|trim|trimn|trunc|truncover|type|unformatted|uniform|union|until|upcase|update|user|usericon|uss|validate|value|var|varfmt|varinfmt|varlabel|varlen|varname|varnum|varray|varrayx|vartype|verify|vformat|vformatd|vformatdx|vformatn|vformatnx|vformatw|vformatwx|vformatx|vinarray|vinarrayx|vinformat|vinformatd|vinformatdx|vinformatn|vinformatnx|vinformatw|vinformatwx|vinformatx|vlabel|vlabelx|vlength|vlengthx|vname|vnamex|vnferr|vtype|vtypex|weekday|weight|when|where|while|wincharset|window|work|workinit|workterm|write|wsum|x|xsync|xwait|yearcutoff|yes|yyq|zipfips|zipname|zipnamel|zipstate))\b
         captures:
           '1': {name: support.class.sas}
         comment: Changes vs rpardee Exclude SQL keywords (relying on improved SQL highlighting or Postgres/MSSQL-specific)
-        comment: 2017.01.14 Moved from #operator to #sas-stuff and Fixed SCOPE per rpardee to be name=support.function.sas capture1=support.class.sas
-        comment: 2017.01.15 NLindner added _n_|_character_|_new_|_numeric_
       - name: constant.numeric.dateformat.I.sas
         #comment: storage.modifier.dateformat.I.sas
         match: (?i:((monname|qtr|weekday|day|month|year|julday|worddate|pdjulg|pdjuli|date|dtdate|dtmonyy|julian|yymon|(ddmmyy|mmddyy|yymmdd|yyq|mmyy|yymm)[bcdnps]?))(?:\d+)?\.)
@@ -219,19 +198,14 @@ repository:
           '3': {name: support.type.dataset.sas}
       - name: keyword.datastep.sas
         match: (?i:\b(by|label|format)\b)
-        comment: 2017.01.14 Similar to rPardee. Needed to add this
-
-
   dataSetOptions:
     patterns:
       - name: keyword.other.sas
         match: (?<=\s|\(|\))(?i:ALTER|BUFNO|BUFSIZE|CNTLLEV|COMPRESS|DLDMGACTION|ENCRYPT|ENCRYPTKEY|EXTENDOBSCOUNTER|GENMAX|GENNUM|INDEX|LABEL|OBSBUF|OUTREP|PW|PWREQ|READ|REPEMPTY|REPLACE|REUSE|ROLE|SORTEDBY|SPILL|TOBSNO|TYPE|WRITE|FILECLOSE|FIRSTOBS|IN|OBS|POINTOBS|WHERE|WHEREUP|IDXNAME|IDXWHERE|DROP|KEEP|RENAME)\s?=
-
   metadatastep:
   #Data step, must start on new line or itll even capture comments. captures
   # code like data work.nml ;, data nml( [and then where drop, etc.)
   # 2016.02.02 NLM prefixed \b to the end capture
-  # 2017.01.15 NLindner added rpardee repository for dataSet
     name: meta.datastep.sas
     begin: ^\s*\b(?i:(\bdata\b)[\s|\n]++)([A-Za-z0-9_\.]+)\s*(;|\()
     beginCaptures:
@@ -254,12 +228,10 @@ repository:
       - include: '#sas-stuff'
       - name: keyword.control.datastep.sas
         comment: DATA set File-Handling Statements for DATA step
-        comment: 2017.01.14 changed scope name supportlfunction.sas and entity.name.class.sas
         match: \b(?i:(set|update|modify|merge)\s++)([A-Za-z0-9_\.]+)
         captures:
           '1': {name: support.function.sas}
           '2': {name: entity.name.class.sas}
-
   metasql:
     name: meta.procsql.sas
     begin: \b(?i:(proc)\s+(sql)\b)
@@ -272,16 +244,8 @@ repository:
       '1': {name: support.function.end}
       '2': {name: keyword.operator.class.terminator.sas}
     patterns:
-      - include: source.sql
-      - include: '#starComment' #added per rpardee 2015.12.06
-      - include: '#blockComment' 
-      - include: '#constant'
-      - include: '#quote'
-      - include: '#operator'
-      - include: '#macrocall'
-      - include: '#metamacro'
-      - name: keyword.operator.null.sas
-        match: (?i:(\bis\b\s(\bnot\s*)?(null|missing)))
+      - name: support.function.sqloptions.sas
+        match: \b(?i:((reset|exitcode|stopontrunc|dquote|inobs|loops|outobs|reduceput|reduceputobs|reduceputvalues|undo_policy|sortseq|ubufsize)|((no)?(constdatetime|dictdiag|double|errorstop|exec|feedback|ipassthru|iponeattempt|number|print|prompt|remerge|sortmsg|stimer|threads|warnrecurs))))\b
       - name: support.function.connect.sas
         match: (?i:((dis)?connect\b\s+(from|to)\b\s)+((\bas\b\s+)?\w++\b))
         captures:
@@ -293,7 +257,16 @@ repository:
         captures:
           '1': {name: variable.language.connection.sas}
           '2': {name: keyword.emphasis.connection.sas}
-
+      - include: source.sql
+      - include: '#starComment' #added per rpardee 2015.12.06
+      - include: '#blockComment' 
+      - include: '#constant'
+      - include: '#quote'
+      - include: '#operator'
+      - include: '#macrocall'
+      - include: '#metamacro'
+      - name: keyword.operator.null.sas
+        match: (?i:\b((is\s+)(not\s+)?)(null|missing)\b)
   metaproc:
     name: meta.proc.sas
     begin: \b(?i:(proc)\s+(\w++)\b)
@@ -311,7 +284,6 @@ repository:
       - include: '#macrocall'
       - include: '#quote'
       - include: '#operator'
-
   metamacro:
     name: meta.macro.sas
     comment: NLM changed order from metadatastep, metasql, metaproc and added another metasql

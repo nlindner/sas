@@ -1,0 +1,317 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/3/syntax.html
+name: SAS MacroSQL
+file_extensions:
+  - sas
+scope: source.sas
+
+contexts:
+  main:
+    - include: starComment
+    - include: blockComment
+    - include: constant
+    - include: string
+    - include: operator
+    - include: parameter-name
+    - include: macrocall
+    - include: sas-stuff
+    - include: metamacro
+    - include: metadatastep
+    - include: metasql
+    - include: parameter-name
+    - include: metaproc
+    - include: metadatastep
+    - match: (?i:\b(_n_|_error_)\b)
+      scope: keyword.sas
+    - include: operator
+    - match: ;
+      scope: line.terminator.sas
+      captures:
+        0: keyword.emphasis.sas
+    - include: macrocall
+    - include: parameter-name
+    - include: starComment
+  blockComment:
+    - match: \/\*
+      push:
+        - meta_scope: comment.block.slashstar.sas
+        - match: \*\/
+          pop: true
+  constant:
+    - include: dateConstant
+    - match: '(?<![&\}])\b[0-9]*\.?[0-9]+([eEdD][-+]?[0-9]+)?\b'
+      comment: numeric constant
+      scope: constant.numeric.sas
+    - match: '('')([^'']+)('')([nN])\b'
+      comment: single quote name literal
+      scope: constant.language.name-literal.single.sas
+    - match: '(")([^"]+)(")([nN])\b'
+      comment: double quote name literal
+      scope: constant.language.name-literal.double.sas
+    - match: '('')([01]+)('')([bB])\b'
+      comment: single quote bit testing constant
+      scope: constant.character.bit.single.sas
+    - match: '(")([01]+)(")([bB])\b'
+      comment: double quote bit testing constant
+      scope: constant.character.bit.double.sas
+    - match: '('')(([a-fA-F0-9]{2})+)('')([xX])\b'
+      comment: single quote hexidecimal constant
+      scope: constant.character.hex.single.sas
+    - match: '(")(([a-fA-F0-9]{2})+)(")([xX])\b'
+      comment: double quote hexidecimal constant
+      scope: constant.character.hex.double.sas
+    - match: '(?i:(")([a-z0-9_\.&]+)(")([xbn]|d|t|dt))\b'
+      comment: double quoted catchall for fallout
+      scope: constant.other.catchothers.macro.sas
+  dataSetOptions:
+    - match: (?<=\s|\(|\))(?i:ALTER|BUFNO|BUFSIZE|CNTLLEV|COMPRESS|DLDMGACTION|ENCRYPT|ENCRYPTKEY|EXTENDOBSCOUNTER|GENMAX|GENNUM|INDEX|LABEL|OBSBUF|OUTREP|PW|PWREQ|READ|REPEMPTY|REPLACE|REUSE|ROLE|SORTEDBY|SPILL|TOBSNO|TYPE|WRITE|FILECLOSE|FIRSTOBS|IN|OBS|POINTOBS|WHERE|WHEREUP|IDXNAME|IDXWHERE|DROP|KEEP|RENAME)\s?=
+      scope: keyword.other.sas
+  dateConstant:
+    - match: '('')(\d{1,2}-?(?i:(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec))-?\d{2,4})('')([dD])\b'
+      comment: single quote date constant
+      scope: constant.numeric.date.single.sas
+    - match: '(")(\d{1,2}-?(?i:(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec))-?\d{2,4})(")([dD])\b'
+      comment: double quote date constant
+      scope: constant.numeric.date.double.sas
+    - match: '('')(\d{1,2}:\d{1,2}(:\d{1,2}(\.\d+)?)?([aApP][mM])?)('')([tT])\b'
+      comment: single quote time constant
+      scope: constant.numeric.time.single.sas
+    - match: '(")(\d{1,2}:\d{1,2}(:\d{1,2}(\.\d+)?)?([aApP][mM])?)(")([tT])\b'
+      comment: double quote time constant
+      scope: constant.numeric.time.single.sas
+    - match: '('')(\d{1,2}(?i:(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec))\d{2,4}:\d{1,2}:\d{1,2}(:\d{1,2}(\.\d+)?)?([aApP][mM])?)('')([dD][tT])\b'
+      comment: single quote datetime constant
+      scope: constant.numeric.datetime.single.sas
+    - match: '(")(\d{1,2}(?i:(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec))\d{2,4}:\d{1,2}:\d{1,2}(:\d{1,2}(\.\d+)?)?([aApP][mM])?)(")([dD][tT])\b'
+      comment: double quote datetime constant
+      scope: constant.numeric.datetime.single.sas
+    - match: '(")(&+(?i:[a-z_]([a-z0-9_]+)?)(\.+)?)(")(?i:(d|t|dt))\b'
+      comment: double quote macro variable date constant
+      scope: constant.numeric.macrodte.double.sas
+  macrocall:
+    - match: (%)+(?i:(if|by|do|else|end|global|goto|local|sysfunc|sysfuncf|then|to|until|while))\b
+      comment: "2015.12.06 added sysfunc and sysfuncf here"
+      scope: keyword.control.macro.sas
+      captures:
+        1: support.class.sas
+        2: support.function.macro.sas
+    - match: '(?i:(%)(?!by|do|else|end|eval\b|global|goto|if|local|macro|mend|then|to|until|while|bquote|include|index|left|length|let|lowcase|nrbquote|nrquote|nrstr|put|qlowcase|qscan|qsubstr|qsysfunc|quote\b|qupcase|scan|str|substr|superq|symexist|symglobl|symlocal|sysevalf|sysfunc|sysget|sysmacexec|sysmacexist|sysmexecdepth|sysmexecname|sysprod|unquote|upcase)([A-Aa-z0-9_&]+))'
+      comment: after excluding macro control tries to match calling to a compiled macro name. This has to be called after everything else. 2015.12.18 Moved paramname ahead of opencode 2016.02.11 added all macro functions from SAS Help (e.g., qlowcase) and aligned the non "macro call" (e.g., do, while, global) with ...#opencode-macrofunction keywords
+      scope: support.function.macrocall.sas
+      captures:
+        1: variable.language.control.sas
+        2: keyword.emphasis.sas
+        3: keyword.operator.class.terminator.sas
+    - include: parameter-name
+    - include: opencode-macrofunction
+  metadatastep:
+    - match: '^\s*\b(?i:(\bdata\b)[\s|\n]++)([A-Za-z0-9_\.]+)\s*(;|\()'
+      captures:
+        1: entity.name.function.datastep.sas
+        2: support.class.sas
+      push:
+        - meta_scope: meta.datastep.sas
+        - match: (?i:\b(run)\b\s*(;))
+          captures:
+            1: support.function.end
+            2: keyword.operator.class.terminator.sas
+          pop: true
+        - include: starComment
+        - include: blockComment
+        - include: dataSetOptions
+        - include: blockComment
+        - include: constant
+        - include: string
+        - include: operator
+        - include: macrocall
+        - include: sas-stuff
+        - match: '\b(?i:(set|update|modify|merge)\s+)([A-Za-z0-9_\.]+)'
+          scope: keyword.control.datastep.sas
+          captures:
+            1: support.function.sas
+            2: entity.name.class.sas
+  metamacro:
+    - match: '(?i:((%)(macro\b\s+)([A-Za-z0-9_]+)\b(.+?)?(;)))'
+      captures:
+        2: keyword.operator.class.macro.sas
+        3: support.class.sas
+        4: support.function.end
+        6: keyword.operator.class.terminator.sas
+      push:
+        - meta_scope: meta.macro.sas
+        - match: '(?i:)(%)+(mend\b)+(\s[A-Za-z0-9_\.]+)?(;)'
+          captures:
+            1: keyword.operator.class.macro.sas
+            2: support.class.sas
+            3: support.function.end
+            4: keyword.operator.class.terminator.sas
+          pop: true
+        - include: starComment
+        - include: blockComment
+        - include: macrocall
+        - include: parameter-name
+        - include: metasql
+        - include: sas-stuff
+        - include: string
+        - include: operator
+        - include: constant
+        - match: ^\s*%\*.*;$
+          comment: SAS crappy format for recognizing line comments in macros
+          scope: comment.line.macro.sas
+          captures:
+            0: punctuation.definition.comment.sas
+        - include: metasql
+        - include: metadatastep
+        - include: metaproc
+  metaproc:
+    - match: \b(?i:(proc)\s+(\w++)\b)
+      captures:
+        1: entity.name.function.proc.sas
+        2: support.class.sas
+      push:
+        - meta_scope: meta.proc.sas
+        - match: (?i:\b(run|quit)\b\s*(;))
+          captures:
+            1: support.function.end
+            2: keyword.operator.class.terminator.sas
+          pop: true
+        - include: sas-stuff
+        - include: starComment
+        - include: blockComment
+        - include: macrocall
+        - include: string
+        - include: operator
+  metasql:
+    - match: \b(?i:(proc)\s+(sql|fedsql)\b)
+      captures:
+        1: entity.name.function.proc.sas
+        2: support.class.sas
+      push:
+        - meta_scope: meta.procsql.sas
+        - match: (?i:\b(quit)\b\s*(;))
+          captures:
+            1: support.function.end
+            2: keyword.operator.class.terminator.sas
+          pop: true
+        - match: \b(?i:((reset|exitcode|stopontrunc|dquote|inobs|loops|outobs|reduceput|reduceputobs|reduceputvalues|undo_policy|sortseq|ubufsize)|((no)?(constdatetime|dictdiag|double|errorstop|exec|feedback|ipassthru|iponeattempt|number|print|prompt|remerge|sortmsg|stimer|threads|warnrecurs))))\b
+          scope: support.function.sqloptions.sas
+        - match: (?i:((dis)?connect\b\s+(from|to)\b\s)+((\bas\b\s+)?\w++\b))
+          scope: support.function.connect.sas
+          captures:
+            1: variable.language.connection.sas
+            3: variable.language.connection.II.sas
+            4: keyword.control.connection.sas
+        - match: (?i:(\bconnection\b\s+\bto\b\s+)+(\w++\b))
+          scope: support.function.fromconnection.sas
+          captures:
+            1: variable.language.connection.sas
+            2: keyword.emphasis.connection.sas
+        - include: scope:source.sql
+        - include: starComment
+        - include: blockComment
+        - include: constant
+        - include: string
+        - include: operator
+        - include: macrocall
+        - include: metamacro
+        - match: (?i:\b((is\s+)(not\s+)?)(null|missing)\b)
+          scope: keyword.operator.null.sas
+  opencode-maskunmatched:
+    - match: \b(%)(?i:((nr)?(quote|str)))\b
+      scope: support.function.opencode.masked.sas
+      captures:
+        1: variable.language.control.sas
+        2: support.class.sas
+    - include: escaped
+      pop: true
+  opencode-macrofunction:
+    - match: (%)(?i:(abort|bquote|copy|compress|display|eval|include|index|left|length|let|list|lowcase|nrbquote|put|qleft|qlowcase|qscan|qsubstr|qsysfunc|qtrim|quote|qupcase|return|scan|substr|superq|symexist|symexist|symglobl|symlocal|syscall|sysevalf|sysfunc|sysget|sysmacexec|sysmacexist|sysmexecdepth|sysmexecname|sysprod|sysrc|sysrput|trim|unquote|upcase|verify))\b
+      scope: support.function.opencode.sas
+      captures:
+        1: variable.language.control.sas
+        2: support.class.sas
+    - include: opencode-maskunmatched
+  opencode-sas:
+    - match: \b(?i:(options))\b
+      scope: support.function.options.sas
+    - match: '(?i:((monname|qtr|weekday|day|month|year|julday|worddate|pdjulg|pdjuli|date|dtdate|dtmonyy|julian|yymon|(ddmmyy|mmddyy|yymmdd|yyq|mmyy|yymm)[bcdnps]?))(?:\d+)?\.)'
+      scope: constant.numeric.dateformat.I.sas
+  operator:
+    - match: '([\+\-\*\^\/])'
+      scope: keyword.operator.arithmetic.sas
+    - match: \b(?i:(eq|ne|gt|lt|ge|le|in|not|and|or|min|max))\b
+      comment: "2015.12.18 NLM removed ampersand from rpardee because was catching macro param names because it is called before"
+      scope: keyword.operator.comparison.I.sas
+    - match: "[!<>]?=|<>|<|>"
+      scope: keyword.operator.comparison.II.sas
+    - match: \|\|
+      scope: keyword.operator.concatenator.sas
+    - match: '([¬<>^~]?=(:)?|>|<|\||!|¦|¬|^|~|<>|><|\|\|)'
+      scope: keyword.operator.sas
+  parameter-name:
+    - match: '(&[\w\.]+)'
+      comment: this has to be called before AND after support.function.opencode. NLM removed space to capture macro params embedded in larger string (or multiple params strung together)
+      scope: variable.parameter.macro.sas
+    - match: (&)(?=&)
+      comment: add highlighting to nested parameter evaluation.
+      scope: variable.parameter.macro.nested.sas
+      captures:
+        2: variable.parameter.macro.sas
+  escaped:
+    - match: "(%)(['])"
+      scope: constant.character.escape.sas
+      pop: false
+    - match: '(%)(["])'
+      scope: constant.character.escape.sas
+      pop: false
+    - match: '(%)([\(\)])'
+      scope: constant.character.escape.sas
+      pop: true
+  string:
+    - match: "'"
+      captures:
+        0: punctuation.definition.string.single.begin.sas
+      push:
+        - meta_scope: string.quoted.single.sas
+        - match: "'"
+          captures:
+            0: punctuation.definition.string.single.end.sas
+          pop: true
+    - match: '"'
+      captures:
+        0: punctuation.definition.string.double.begin.sas
+      push: 
+        - meta_scope: string.quoted.double.sas
+        - match: '"'
+          captures:
+            0: punctuation.definition.string.double.end.sas
+          pop: true
+    - include: parameter-name
+  sas-stuff:
+    - match: '\b(?i:(_all_|_character_|_cmd_|_freq_|_i_|_infile_|_last_|_msg_|_n_|_new_|_null_|_numeric_|_temporary_|_type_|abort|abs|addr|adjrsq|airy|alpha|alter|altlog|altprint|and|arcos|array|arsin|as|atan|attrc|attrib|attrn|authserver|autoexec|awscontrol|awsdef|awsmenu|awsmenumerge|awstitle|backward|band|base|betainv|between|blocksize|blshift|bnot|bor|brshift|bufno|bufsize|bxor|by|byerr|byline|byte|calculated|call|cards|cards4|catcache|cbufno|cdf|ceil|center|cexist|change|chisq|cinv|class|cleanup|close|cnonct|cntllev|coalesce|codegen|col|collate|collin|column|comamid|comaux1|comaux2|comdef|compbl|compound|compress|config|continue|convert|cos|cosh|cpuid|create|cross|crosstab|css|curobs|cv|daccdb|daccdbsl|daccsl|daccsyd|dacctab|dairy|datalines|datalines4|datejul|datepart|datetime|day|dbcslang|dbcstype|dclose|ddm|delete|delimiter|depdb|depdbsl|depsl|depsyd|deptab|dequote|descending|descript|design=|device|dflang|dhms|dif|digamma|dim|dinfo|display|distinct|dkricond|dkrocond|dlm|dnum|do|dopen|doptname|doptnum|dread|drop|dropnote|dsname|dsnferr|echo|else|emaildlg|emailid|emailpw|emailserver|emailsys|encrypt|end|endsas|engine|eof|eov|erf|erfc|error|errorcheck|errors|exist|exp|fappend|fclose|fcol|fdelete|feedback|fetch|fetchobs|fexist|fget|file|fileclose|fileexist|filefmt|filename|fileref|filevar|finfo|finv|fipname|fipnamel|fipstate|first|firstobs|floor|fmterr|fmtsearch|fnonct|fnote|font|fontalias|footnote[1-9]?|fopen|foptname|foptnum|force|formatted|formchar|formdelim|formdlim|forward|fpoint|fpos|fput|fread|frewind|frlen|from|fsep|fuzz|fwrite|gaminv|gamma|getoption|getvarc|getvarn|go|goto|group|gwindow|hbar|hbound|helpenv|helploc|hms|honorappearance|hosthelp|hostprint|hour|hpct|html|hvar|ibessel|ibr|id|if|index|indexc|indexw|initcmd|initstmt|inner|input|inputc|inputn|inr|insert|int|intck|intnx|into|intrr|invaliddata|irr|is|jbessel|join|juldate|keep|kentb|kurtosis|label|lag|last|lbound|leave|left|length|levels|lgamma|lib|libname|library|libref|line|linesize|link|list|log|log10|log2|logpdf|logpmf|logsdf|lostcard|lowcase|lrecl|ls|macro|macrogen|maps|mautosource|max|maxdec|maxr|mdy|mean|measures|median|memtype|merge|merror|min|minute|missing|missover|mlogic|mod|mode|model|modify|month|mopen|mort|mprint|mrecall|msglevel|msymtabmax|mvarsize|myy|n|nest|netpv|new|news|nmiss|no|nobatch|nobs|nocaps|nocardimage|nocenter|nocharcode|nocmdmac|nocol|nocum|nodate|nodbcs|nodetails|nodmr|nodms|nodmsbatch|nodup|nodupkey|noduplicates|noechoauto|noequals|noerrorabend|noexitwindows|nofullstimer|noicon|noimplmac|noint|nolist|noloadlist|nomiss|nomlogic|nomprint|nomrecall|nomsgcase|nomstored|nomultenvappl|nonotes|nonumber|noobs|noovp|nopad|nopercent|noprint|noprintinit|normal|norow|norsasuser|nosetinit|nosource2|nosplash|nosymbolgen|note|notes|notitle|notitles|notsorted|noverbose|noxsync|noxwait|npv|null|number|numkeys|nummousekeys|nway|obs|ods|on|open|option|order|ordinal|otherwise|out|outer|outp=|output|over|ovp|p(1|5|10|25|50|75|90|95|99)|pad|pad2|page|pageno|pagesize|paired|parm|parmcards|path|pathdll|pathname|pdf|peek|peekc|pfkey|pmf|point|poisson|poke|position|printer|probbeta|probbnml|probchi|probf|probgam|probhypr|probit|probnegb|probnorm|probsig|probt|procleave|prt|ps|put|putc|putn|pw|pwreq|qtr|quote|r|ranbin|rancau|ranexp|rangam|range|ranks|rannor|ranpoi|rantbl|rantri|ranuni|read|recfm|register|regr|remote|remove|rename|repeat|replace|resolve|retain|return|reuse|reverse|rewind|right|round|rsquare|rtf|rtrace|rtraceloc|s|s2|samploc|sasautos|sascontrol|sasfrscr|sashelp|sasmsg|sasmstore|sasscript|sasuser|saving|scan|sdf|second|select|selection|separated|seq|serror|set|setcomm|setot|sign|simple|sin|sinh|siteinfo|skewness|skip|sle|sls|sortedby|sortpgm|sortseq|sortsize|soundex|source2|spedis|splashlocation|split|spool|sqrt|start|std|stderr|stdin|stfips|stimer|stname|stnamel|stop|stopover|strip|subgroup|subpopn|substr|sum|sumwgt|symbol|symbolgen|symget|symput|sysget|sysin|sysleave|sysmsg|sysparm|sysprint|sysprintfont|sysprod|sysrc|system|t|table|tables|tan|tanh|tapeclose|tbufsize|terminal|test|then|timepart|tinv|title[1-9]?|tnonct|to|today|tol|tooldef|totper|transformout|translate|trantab|tranwrd|trigamma|trim|trimn|trunc|truncover|type|unformatted|uniform|union|until|upcase|update|user|usericon|uss|validate|value|var|varfmt|varinfmt|varlabel|varlen|varname|varnum|varray|varrayx|vartype|verify|vformat|vformatd|vformatdx|vformatn|vformatnx|vformatw|vformatwx|vformatx|vinarray|vinarrayx|vinformat|vinformatd|vinformatdx|vinformatn|vinformatnx|vinformatw|vinformatwx|vinformatx|vlabel|vlabelx|vlength|vlengthx|vname|vnamex|vnferr|vtype|vtypex|weekday|weight|when|where|while|wincharset|window|work|workinit|workterm|write|wsum|x|xsync|xwait|yearcutoff|yes|yyq|zipfips|zipname|zipnamel|zipstate))\b'
+      scope: support.function.sas
+      captures:
+        1: support.class.sas
+    - match: '(?i:((monname|qtr|weekday|day|month|year|julday|worddate|pdjulg|pdjuli|date|dtdate|dtmonyy|julian|yymon|(ddmmyy|mmddyy|yymmdd|yyq|mmyy|yymm)[bcdnps]?))(?:\d+)?\.)'
+      scope: constant.numeric.dateformat.I.sas
+    - match: '(?i:(\bdata\b)(\s*\=\s*)+([A-Za-z0-9_\.]++)\b)'
+      scope: support.function.dataset.sas
+      captures:
+        1: support.function.dataset.sas
+        2: keyword.operator.comparison.II.sas
+        3: support.type.dataset.sas
+    - match: (?i:\b(by|label|format)\b)
+      scope: keyword.datastep.sas
+  starComment:
+    - include: blockComment
+    - match: '(?<=;)[\s%]*\*'
+      push:
+        - meta_scope: comment.line.inline.star.sas
+        - match: ;
+          pop: true
+    - match: '^[\s%]*\*'
+      push:
+        - meta_scope: comment.line.start.sas
+        - match: ;
+          pop: true
